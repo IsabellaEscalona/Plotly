@@ -21,6 +21,8 @@ class User(db.Model):
 
     perfil = db.relationship('Profile', backref='user', uselist=False)
 
+    Post = db.relationship('Post', backref='author')
+
 
     def serialize(self):
         return {
@@ -61,6 +63,14 @@ class Post(db.Model):
     title = db.Column(db.String(200))
     category = db.Column(db.Enum(Enum_Category_Post), nullable=False)
     description = db.Column(db.String(1000))
+
+    content = db.relationship('Content_Post', backref='post')
+
+    comment = db.relationship('Comment', backref='post')
+    
+    like = db.relationship('Like', backref='post')
+
+
 
 class Enum_Type_Media(enum.Enum):
     GIF = 'gif'
