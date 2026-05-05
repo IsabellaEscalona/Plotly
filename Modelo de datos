@@ -1,0 +1,52 @@
+user
+-
+id integer PK
+username str unique
+email str unique
+password str
+
+followers
+-
+user_follower integer FK >- user.id
+user_followed integer FK >- user.id
+
+perfil
+-
+id integer PK
+user_id integer FK >- user.id
+profile_picture str
+bio str
+artist_type str
+instagram str
+twitter str
+facebook str
+otros str
+
+post
+-
+id integer PK
+user_id integer FK >- user.id
+title str
+category str
+description str
+
+contenido_post
+-
+id integer PK
+post_id integer FK >- post.id
+type enum
+url str
+
+comments
+-
+id integer PK
+user_id integer FK >- user.id
+post_id integer FK >- post.id
+content str
+
+like
+-
+id integer PK
+user_id integer FK >- user.id
+post_id integer FK >- post.id
+liked bool
