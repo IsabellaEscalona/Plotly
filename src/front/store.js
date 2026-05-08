@@ -1,4 +1,4 @@
-export const initialStore=()=>{
+/*export const initialStore=()=>{
   return{
     message: null,
     todos: [
@@ -15,6 +15,8 @@ export const initialStore=()=>{
     ]
   }
 }
+
+
 
 export default function storeReducer(store, action = {}) {
   switch(action.type){
@@ -35,4 +37,25 @@ export default function storeReducer(store, action = {}) {
     default:
       throw Error('Unknown action.');
   }    
+}*/
+
+export const initialStore = () => ({
+    message: null,
+    token: null,
+    user: null
+})
+
+export default function storeReducer(store, action = {}) {
+    switch (action.type) {
+        case 'set_hello':
+            return { ...store, message: action.payload }
+        case 'set_token':
+            return { ...store, token: action.payload }
+        case 'set_user':
+            return { ...store, user: action.payload }
+        case 'logout':
+            return { ...store, token: null, user: null }
+        default:
+            throw Error('Unknown action.')
+    }
 }
