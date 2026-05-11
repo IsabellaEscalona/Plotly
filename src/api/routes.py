@@ -39,7 +39,7 @@ def signup():
     db.session.commit()
     return jsonify({"message": "Usuario creado correctamente!"}), 200
 
-@api.route('/me', methods=['POST'])
+@api.route('/me', methods=['GET'])
 @jwt_required()
 def show_own_profile():
     id = get_jwt_identity()
