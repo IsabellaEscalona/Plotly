@@ -21,20 +21,3 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
-
-
-@api.route('/signup', methods=['POST'])
-def signup():
-    body=request.json
-    if not body.get("email") or not body.get("contraseña") or not body.get("usuario"):
-        return jsonify({"error": "Email, usuario y  contraseña son obligatorios!"}), 400
-    existing_user = User.query.filter_by(email=body["email"]).first()
-    if existing_user:
-        return jsonify({"error": "User already exists"}), 400
-    new_user = User(email=body["email"], password=body["contraseña"], username=body["usuario"])
-    db.session.add(new_user)
-    db.session.flush()
-    new_profile = Profile(user_id=new_user.id)
-    db.session.add(new_profile)
-    db.session.commit()
-    return jsonify({"message": "Usuario creado correctamente!"}), 200

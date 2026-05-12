@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 import enum
 from sqlalchemy import String, Boolean, Enum
 from sqlalchemy.orm import Mapped, mapped_column
+from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
 
@@ -22,6 +23,9 @@ class User(db.Model):
     perfil = db.relationship('Profile', backref='user', uselist=False)
 
     Post = db.relationship('Post', backref='author')
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
 
 
     def serialize(self):
