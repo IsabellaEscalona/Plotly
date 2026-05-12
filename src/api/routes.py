@@ -6,9 +6,10 @@ from api.models import db, User, Profile
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_bcrypt import Bcrypt
 
 api = Blueprint('api', __name__)
-
+bcrypt = Bcrypt()
 # Allow CORS requests to this API
 CORS(api)
 
@@ -31,7 +32,8 @@ def signup():
     existing_user = User.query.filter_by(email=body["email"]).first()
     if existing_user:
         return jsonify({"error": "User already exists"}), 400
-    new_user = User(email=body["email"], password=body["contraseña"], username=body["usuario"])
+    hashed = bcrypt.generate_password_hash(body["contraseña"]).decode('utf-8')
+    new_user = User(email=body["email"], password=hashed, username=body["usuario"])
     db.session.add(new_user)
     db.session.flush()
     new_profile = Profile(user_id=new_user.id)
@@ -39,9 +41,12 @@ def signup():
     db.session.commit()
     return jsonify({"message": "Usuario creado correctamente!"}), 200
 
-@api.route('/me', methods=['GET'])
-@jwt_required()
-def show_own_profile():
-    id = get_jwt_identity()
-    user = User.query.get(id)
-    return jsonify(user.serialize()),200
+
+@api.route('/login', methods=['POST'])
+def login():
+    body = request.json
+    user = User.query.filter_by(email=body["email"]).first()
+    if user is None or not bcrypt.check_password_hash(user.password, body["contraseña"]):
+        return jsonify({"error": "Email o contraseña incorrectos!"}), 401
+    token = create_access_token(identity=str(user.id))
+    return jsonify({"token": token, "user": user.serialize()}), 200
