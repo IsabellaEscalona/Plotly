@@ -9,20 +9,22 @@ export const Login = () => {
     const navigate = useNavigate()
 
 
-    /*revisar para futuro carlos
-    const handleSubmit = async () => {
+    const handleLogin = async () => {
         const resp = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, contraseña: password})
         })
+        const data = await resp.json()
         if (resp.ok) {
-            navigate("/login")
+            sessionStorage.setItem("token", data.token)
+            dispatch({type:"set_token", payload: data.token})
+            navigate("/")
         } else {
-            alert("Algo salió mal): intenta de nuevo.")
+            alert("Email o contraseña incorrectos. Intenta de nuevo!")
         }
     }
-        */
+        
     
     return (
         <div className="container mt-5" style={{ maxWidth: "400px" }}>

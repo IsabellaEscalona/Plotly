@@ -5,9 +5,15 @@ export const Signup = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [username, setUsername] = useState("")
+    const [confirmPassword, setConfirmPassword] = useState("")
     const navigate = useNavigate()
 
     const handleSubmit = async () => {
+
+        if (password !== confirmPassword) {
+        alert("Las contraseñas no coinciden!")
+        return
+    }
         const resp = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -18,7 +24,7 @@ export const Signup = () => {
             navigate("/login")
         } else {
             alert("Algo salió mal): intenta de nuevo por favor.")
-        }
+        } 
     }
 
     /*falta mejorar este frontend jaja*/
@@ -30,6 +36,7 @@ export const Signup = () => {
                 <input type="text" placeholder="Usuario" className="form-control mb-3" onChange={e => setUsername(e.target.value)} />
                 <input type="email" placeholder="Email" className="form-control mb-3" onChange={e => setEmail(e.target.value)} />
                 <input type="password" placeholder="Contraseña" className="form-control mb-3" onChange={e => setPassword(e.target.value)} />
+                <input type="password" placeholder="Confirme contraseña" className="form-control mb-3" onChange={e => setConfirmPassword(e.target.value)} />
                 <button className="btn w-100" style={{ backgroundColor: "green", color: "white" }} onClick={handleSubmit}>
                     Registrarse
                 </button>
