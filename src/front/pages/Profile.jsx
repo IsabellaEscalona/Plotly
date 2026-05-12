@@ -20,14 +20,14 @@ export const Profile = () => {
         <section className='vh-100 vw-100'>
             <div className="container-fluid py-5 h-100">
                 <div className="row d-flex justify-content-center">
-                    <div className="col col-lg-11 col-xl-10">
+                    <div className="col col-lg-11 col-xl-8">
                         <div className="card">
                             <div className="rounded-top text-white d-flex flex-row" style={{ 'backgroundColor': '#000', 'height': '200px' }}>
                                 <div className="ms-4 mt-5 d-flex flex-column" style={{'width':'150'}}>
 
                                     <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp" 
                                     alt="generic placeholder image" className='img-fluid img-thumbnail rounded-circle mt-4 mb-2'
-                                     style={{'zIndex':'1'}}/>
+                                     style={{'zIndex':'1', 'height':'150px'}}/>
                                     <button type='button' className='btn btn-outline-dark text-body'
                                     style={{'zIndex':'1'}}>
                                         Edit Profile
