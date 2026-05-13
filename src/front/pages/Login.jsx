@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx"
 
 export const Login = () => {
@@ -19,7 +19,7 @@ export const Login = () => {
         if (resp.ok) {
             sessionStorage.setItem("token", data.token)
             dispatch({type:"set_token", payload: data.token})
-            navigate("/")
+            navigate("/me")
         } else {
             alert("Email o contraseña incorrectos. Intenta de nuevo!")
         }
@@ -32,6 +32,9 @@ export const Login = () => {
             <input type="email" placeholder="Email" className="form-control mb-2" onChange={e => setEmail(e.target.value)} />
             <input type="password" placeholder="Contraseña" className="form-control mb-2" onChange={e => setPassword(e.target.value)} />
             <button className="btn btn-success w-100" onClick={handleLogin}>Entrar</button>
+             <p style={{ color: "gray", textAlign: "center", fontSize: "1rem" }}>
+                                ¿No tienes cuenta? <Link to="/signup" style={{ color: "blue" }}>Registrate</Link>
+                            </p>
         </div>
     )
 }
