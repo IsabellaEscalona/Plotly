@@ -34,7 +34,7 @@ export const Profile = () => {
                                     </button>
                                 </div>
                                 <div className="ms-3" style={{'marginTop':'130px'}}>
-                                    <h5>Username</h5>
+                                    <h5>{username}</h5>
                                     <p>Artist Type</p>
                                 </div>
                             </div>

@@ -19,7 +19,7 @@ export const Login = () => {
         if (resp.ok) {
             sessionStorage.setItem("token", data.token)
             dispatch({type:"set_token", payload: data.token})
-            navigate("/")
+            navigate("/me")
         } else {
             alert("Email o contraseña incorrectos. Intenta de nuevo!")
         }
