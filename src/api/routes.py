@@ -26,14 +26,15 @@ def handle_hello():
 
 @api.route('/signup', methods=['POST'])
 def signup():
-    body=request.json
+    body = request.json
     if not body.get("email") or not body.get("contraseña") or not body.get("usuario"):
         return jsonify({"error": "Email, usuario y  contraseña son obligatorios!"}), 400
     existing_user = User.query.filter_by(email=body["email"]).first()
     if existing_user:
         return jsonify({"error": "User already exists"}), 400
     hashed = bcrypt.generate_password_hash(body["contraseña"]).decode('utf-8')
-    new_user = User(email=body["email"], password=hashed, username=body["usuario"])
+    new_user = User(email=body["email"],
+                    password=hashed, username=body["usuario"])
     db.session.add(new_user)
     db.session.flush()
     new_profile = Profile(user_id=new_user.id)
@@ -50,3 +51,10 @@ def login():
         return jsonify({"error": "Email o contraseña incorrectos!"}), 401
     token = create_access_token(identity=str(user.id))
     return jsonify({"token": token, "user": user.serialize()}), 200
+
+@api.route('/me', methods=['GET'])
+@jwt_required()
+def show_own_profile():
+    id = get_jwt_identity()
+    user = User.query.get(id)
+    return jsonify(user.serialize()), 200
