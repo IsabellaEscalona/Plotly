@@ -18,7 +18,9 @@ export const Login = () => {
         const data = await resp.json()
         if (resp.ok) {
             sessionStorage.setItem("token", data.token)
+            sessionStorage.setItem("user", JSON.stringify(data.user))
             dispatch({type:"set_token", payload: data.token})
+            dispatch({type:"set_user", payload: data.user})
             navigate("/me")
         } else {
             alert("Email o contraseña incorrectos. Intenta de nuevo!")
