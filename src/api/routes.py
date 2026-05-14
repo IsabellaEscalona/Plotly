@@ -59,3 +59,18 @@ def show_own_profile():
     id = get_jwt_identity()
     user = User.query.get(id)
     return jsonify(user.serialize()), 200
+
+
+@api.route('/change-password', methods=['PUT'])
+@jwt_required()
+def change_password():
+    body = request.json
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not bcrypt.check_password_hash(user.password, body["contraseña_actual"]):
+        return jsonify({"error": "Contraseña actual equivocada, prueba de nuevo!"}), 401
+    hashed = bcrypt.generate_password_hash(body["nueva_contraseña"]).decode('utf-8')
+    user.password = hashed
+    db.session.commit()
+    return jsonify({"message": "Contraseña actualizada :)"}), 200
+
