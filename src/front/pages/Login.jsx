@@ -13,30 +13,33 @@ export const Login = () => {
         const resp = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, contraseña: password})
+            body: JSON.stringify({ email, contraseña: password })
         })
         const data = await resp.json()
+
         if (resp.ok) {
             sessionStorage.setItem("token", data.token)
             sessionStorage.setItem("user", JSON.stringify(data.user))
-            dispatch({type:"set_token", payload: data.token})
-            dispatch({type:"set_user", payload: data.user})
+            sessionStorage.setItem("profile", JSON.stringify(data.profile))
+            dispatch({ type: "set_token", payload: data.token })
+            dispatch({ type: "set_user", payload: data.user })
+            dispatch({ type: "set_profile", payload: data.profile })
             navigate("/me")
         } else {
             alert("Email o contraseña incorrectos. Intenta de nuevo!")
         }
     }
-        
-    
+
+
     return (
         <div className="container mt-5" style={{ maxWidth: "400px" }}>
             <h2>Iniciar sesión</h2>
             <input type="email" placeholder="Email" className="form-control mb-2" onChange={e => setEmail(e.target.value)} />
             <input type="password" placeholder="Contraseña" className="form-control mb-2" onChange={e => setPassword(e.target.value)} />
             <button className="btn btn-success w-100" onClick={handleLogin}>Entrar</button>
-             <p style={{ color: "gray", textAlign: "center", fontSize: "1rem" }}>
-                                ¿No tienes cuenta? <Link to="/signup" style={{ color: "blue" }}>Registrate</Link>
-                            </p>
+            <p style={{ color: "gray", textAlign: "center", fontSize: "1rem" }}>
+                ¿No tienes cuenta? <Link to="/signup" style={{ color: "blue" }}>Registrate</Link>
+            </p>
         </div>
     )
 }
