@@ -56,5 +56,36 @@ def login():
 @jwt_required()
 def show_own_profile():
     id = get_jwt_identity()
-    user = User.query.get(id)
-    return jsonify(user.serialize()), 200
+    user = db.session.get(User, id)
+    data = user.serialize()
+    if user.perfil:
+        data['bio'] = user.perfil.bio
+        data['instagram'] = user.perfil.instagram
+        data['twitter'] = user.perfil.twitter
+        data['profile_picture'] = user.perfil.profile_picture
+    return jsonify(data), 200
+
+@api.route('/settings', methods=['PUT'])
+@jwt_required()
+def update_profile():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    profile = user.perfil
+
+    body = request.json
+
+    # Actualizar USER
+    user.username = body.get("username", user.username)
+    user.email = body.get("email", user.email)
+
+    if body.get("password"):
+        user.password = bcrypt.generate_password_hash(body["password"]).decode('utf-8')
+
+    # Actualizar PERFIL
+    profile.bio = body.get("bio", profile.bio)
+    profile.instagram = body.get("instagram", profile.instagram)
+    profile.twitter = body.get("twitter", profile.twitter)
+
+    db.session.commit()
+
+    return jsonify({"message": "perfil actualizado correctamente"}), 200
