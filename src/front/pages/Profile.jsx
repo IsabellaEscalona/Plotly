@@ -18,8 +18,11 @@ export const Profile = () => {
                                     <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"
                                         alt="generic placeholder image" className='img-fluid img-thumbnail rounded-circle mt-4 mb-2'
                                         style={{ 'zIndex': '1', 'height': '150px' }} />
-                                    <button type='button' className='btn btn-outline-dark text-body'
-                                        style={{ 'zIndex': '1' }}>
+                                    <button 
+                                    onClick={() => navigate('/settings')}
+                                    type='button' 
+                                    className='btn btn-outline-dark text-body'
+                                    style={{ 'zIndex': '1' }}>
                                         Edit Profile
                                     </button>
                                 </div>
@@ -51,8 +54,15 @@ export const Profile = () => {
                                             <label className='py-2 ' htmlFor="Bio">Biography:</label>
                                             <textarea className='form-control mb-4' name="Bio"
                                                 placeholder='Sobre ti...'
-                                                disabled></textarea>
+                                                value={store?.profile?.bio || ''}
+                                                readOnly></textarea>
                                         </div>
+                                        {store?.profile?.instagram && (
+                                            <p className="mb-1"><i class="fa-brands fa-instagram"></i> Instagram: <strong>{store.profile.instagram}</strong></p>
+                                            )}
+                                        {store?.profile?.twitter && (
+                                            <p className="mb-1"><i class="fa-brands fa-x-twitter"></i> Twitter: <strong>{store.profile.twitter}</strong></p>
+                                            )}
                                     </div>
                                     <div className='col-8'>
                                         Post1

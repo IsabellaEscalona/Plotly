@@ -12,6 +12,7 @@ import { Demo } from "./pages/Demo";
 import { Signup } from "./pages/Signup";
 import { Login } from "./pages/Login";
 import { Profile } from "./pages/Profile";
+import { Settings} from "./pages/Settings";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -30,7 +31,8 @@ export const router = createBrowserRouter(
         <Route path="/demo" element={<Demo />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/me" element={ <Profile /> }></Route>
+        <Route path="/me" element={ <Profile /> }> </Route>
+        <Route path="/settings" element={<Settings />} />
       </Route>
     )
 );
