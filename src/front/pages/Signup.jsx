@@ -6,42 +6,89 @@ export const Signup = () => {
     const [password, setPassword] = useState("")
     const [username, setUsername] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
+    const [error, setError] = useState("")
     const navigate = useNavigate()
 
     const handleSubmit = async () => {
-
+        setError("")
         if (password !== confirmPassword) {
-        alert("Las contraseñas no coinciden!")
-        return
-    }
+            setError("Las contraseñas no coinciden.")
+            return
+        }
         const resp = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, contraseña: password, usuario: username })
         })
         if (resp.ok) {
-            alert("Usuario creado! Por favor inicia sesión.")
             navigate("/login")
         } else {
-            alert("Algo salió mal): intenta de nuevo por favor.")
-        } 
+            const data = await resp.json()
+            setError(data.error || "Algo salió mal, intentá de nuevo.")
+        }
     }
 
-    /*falta mejorar este frontend jaja*/
     return (
-        <div style={{ minHeight: "100vh", backgroundColor: "#1a1a2e", display: "flex",  justifyContent: "center" }}>
-            <div style={{ backgroundColor: "black", borderRadius: "10px", width: "400px"}}>
-                <h2 style={{ color: "white", textAlign: "center"}}>Plotly</h2>
-                <h5 style={{ color: "white"}}>Crear cuenta</h5>
-                <input type="text" placeholder="Usuario" className="form-control mb-3" onChange={e => setUsername(e.target.value)} />
-                <input type="email" placeholder="Email" className="form-control mb-3" onChange={e => setEmail(e.target.value)} />
-                <input type="password" placeholder="Contraseña" className="form-control mb-3" onChange={e => setPassword(e.target.value)} />
-                <input type="password" placeholder="Confirme contraseña" className="form-control mb-3" onChange={e => setConfirmPassword(e.target.value)} />
-                <button className="btn w-100" style={{ backgroundColor: "green", color: "white" }} onClick={handleSubmit}>
+        <div 
+        className="d-flex justify-content-center align-items-center" 
+        style={{ minHeight: "100vh", backgroundColor: "#12121f" }}>
+            <div 
+            className="p-4 rounded-4 shadow" 
+            style={{ backgroundColor: "#1e1e2e", width: "100%", maxWidth: "420px" }}>
+
+                <div className="text-center mb-4">
+                    <span style={{ fontSize: "2rem", color: "rgb(255, 255, 255)" }}><i class="fa-solid fa-cubes"></i></span>
+                    <h4 className="text-white fw-bold mt-1">Plotly</h4>
+                    <p className="text-secondary mb-0">Creá tu cuenta</p>
+                </div>
+
+
+                {error && <div className="alert alert-danger py-2">{error}</div>}
+
+                <div className="mb-3">
+                    <label className="form-label text-secondary">Usuario</label>
+                    <input
+                        type="text"
+                        className="form-control border-secondary"
+                        placeholder="nombre de usuario"
+                        onChange={e => setUsername(e.target.value)}
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label text-secondary">Email</label>
+                    <input
+                        type="email"
+                        className="form-control border-secondary"
+                        placeholder="ejemplo@email.com"
+                        onChange={e => setEmail(e.target.value)}
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label text-secondary">Contraseña</label>
+                    <input
+                        type="password"
+                        className="form-control border-secondary"
+                        placeholder="********"
+                        onChange={e => setPassword(e.target.value)}
+                    />
+                </div>
+                <div className="mb-4">
+                    <label className="form-label text-secondary">Confirmar contraseña</label>
+                    <input
+                        type="password"
+                        className="form-control border-secondary"
+                        placeholder="********"
+                        onChange={e => setConfirmPassword(e.target.value)}
+                    />
+                </div>
+
+                <button className="btn btn-light w-100 fw-bold" onClick={handleSubmit}>
                     Registrarse
                 </button>
-                <p style={{ color: "gray", textAlign: "center", fontSize: "1rem" }}>
-                    ¿Ya tienes cuenta? <Link to="/login" style={{ color: "blue" }}>Inicia sesión</Link>
+
+                <p className="text-center text-secondary mt-3 mb-0" style={{ fontSize: "0.9rem" }}>
+                    ¿Tienes cuenta?{" "}
+                    <Link to="/login" className="text-light">Iniciá sesión</Link>
                 </p>
             </div>
         </div>
