@@ -39,22 +39,36 @@ class User(db.Model):
 
 class Enum_Artist(enum.Enum):
     COMIC_ARTIST = 'comic artist'
-    WRITER = 'writer'
-    HYBRID = 'hybrid'
-    READER = 'reader'
+    WRITER = 'Writer'
+    HYBRID = 'Hybrid'
+    READER = 'Reader'
 
 
 class Profile(db.Model):
     __tablename__ = 'profiles'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    profile_picture = db.Column(db.String(250))
-    bio = db.Column(db.String(500))
+    profile_picture = db.Column(db.String(250), default=None)
+    bio = db.Column(db.String(500), default=None)
     artist_type = db.Column(db.Enum(Enum_Artist), default=Enum_Artist.READER)
-    instagram = db.Column(db.String(180))
-    twitter = db.Column(db.String(180))
-    facebook = db.Column(db.String(180))
-    otros = db.Column(db.String(180))
+    instagram = db.Column(db.String(180), default=None)
+    twitter = db.Column(db.String(180), default=None)
+    facebook = db.Column(db.String(180),default=None)
+    otros = db.Column(db.String(180),default=None)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id":self.user_id,
+            "profile_picture":self.profile_picture,
+            "bio":self.bio,
+            "artist_type":self.artist_type.value,
+            "instagram":self.instagram,
+            "twitter":self.twitter,
+            "facebook":self.facebook,
+            "otros":self.otros
+            # do not serialize the password, its a security breach
+        }
 
 class Enum_Category_Post(enum.Enum):
     ONLY_TEXT = 'only text'

@@ -4,6 +4,7 @@ import useGlobalReducer from '../hooks/useGlobalReducer'
 
 export const Profile = () => {
     const { store } = useGlobalReducer()
+    const { store } = useGlobalReducer()
     const navigate = useNavigate()
     const [perfil, setPerfil] = useState(null)
 
