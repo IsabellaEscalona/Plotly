@@ -79,6 +79,8 @@ def update_profile():
     user.username = body.get("username", user.username)
     user.email = body.get("email", user.email)
 
+    if body.get("password"):
+        user.password = bcrypt.generate_password_hash(body["password"]).decode('utf-8')
 
     # Actualizar PERFIL
     profile.bio = body.get("bio", profile.bio)
@@ -88,16 +90,3 @@ def update_profile():
     db.session.commit()
 
     return jsonify({"message": "perfil actualizado correctamente"}), 200
-
-@api.route('/change-password', methods=['PUT'])
-@jwt_required()
-def change_password():
-    body = request.json
-    user_id = get_jwt_identity()
-    user = User.query.get(user_id)
-    if not bcrypt.check_password_hash(user.password, body["contraseña_actual"]):
-        return jsonify({"error": "Contraseña actual equivocada, prueba de nuevo!"}), 401
-    hashed = bcrypt.generate_password_hash(body["nueva_contraseña"]).decode('utf-8')
-    user.password = hashed
-    db.session.commit()
-    return jsonify({"message": "Contraseña actualizada :)"}), 200
