@@ -39,9 +39,9 @@ class User(db.Model):
 
 class Enum_Artist(enum.Enum):
     COMIC_ARTIST = 'comic artist'
-    WRITER = 'writer'
-    HYBRID = 'hybrid'
-    READER = 'reader'
+    WRITER = 'Writer'
+    HYBRID = 'Hybrid'
+    READER = 'Reader'
 
 
 class Profile(db.Model):
