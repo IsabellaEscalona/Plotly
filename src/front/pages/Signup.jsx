@@ -15,6 +15,10 @@ export const Signup = () => {
             setError("Las contraseñas no coinciden.")
             return
         }
+        if (password.length < 6) {
+        setError("La contraseña debe tener al menos 6 caracteres.")
+        return
+    }
         const resp = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/signup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -24,7 +28,7 @@ export const Signup = () => {
             navigate("/login")
         } else {
             const data = await resp.json()
-            setError(data.error || "Algo salió mal, intentá de nuevo.")
+            setError(data.error || "Algo salió mal, intente de nuevo.")
         }
     }
 
@@ -41,10 +45,7 @@ export const Signup = () => {
                     <h4 className="text-white fw-bold mt-1">Plotly</h4>
                     <p className="text-secondary mb-0">Creá tu cuenta</p>
                 </div>
-
-
                 {error && <div className="alert alert-danger py-2">{error}</div>}
-
                 <div className="mb-3">
                     <label className="form-label text-secondary">Usuario</label>
                     <input
@@ -71,6 +72,9 @@ export const Signup = () => {
                         placeholder="********"
                         onChange={e => setPassword(e.target.value)}
                     />
+                    <small className="text-secondary d-block mb-1" style={{ fontSize: "0.89rem" }}>
+                        Mínimo 6 caracteres
+                    </small>
                 </div>
                 <div className="mb-4">
                     <label className="form-label text-secondary">Confirmar contraseña</label>
@@ -81,14 +85,12 @@ export const Signup = () => {
                         onChange={e => setConfirmPassword(e.target.value)}
                     />
                 </div>
-
-                <button className="btn btn-light w-100 fw-bold" onClick={handleSubmit}>
+                <button className="btn btn-primary w-100 fw-bold" onClick={handleSubmit}>
                     Registrarse
                 </button>
-
                 <p className="text-center text-secondary mt-3 mb-0" style={{ fontSize: "0.9rem" }}>
                     ¿Tienes cuenta?{" "}
-                    <Link to="/login" className="text-light">Iniciá sesión</Link>
+                    <Link to="/login" >Iniciá sesión</Link>
                 </p>
             </div>
         </div>
