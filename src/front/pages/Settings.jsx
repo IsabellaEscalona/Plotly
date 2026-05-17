@@ -76,6 +76,7 @@ export const Settings = () => {
                     <input className="form-control" name="username" value={form.username}
                         onChange={e => setForm({ ...form, username: e.target.value })} />
                 </div>
+                {/* email aun no recibe cambio correctamente*/}
                 <div className="col-md-6">
                     <label className="form-label">Email</label>
                     <input className="form-control" name="email" value={form.email}

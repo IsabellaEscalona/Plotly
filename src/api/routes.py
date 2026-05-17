@@ -47,9 +47,9 @@ def signup():
 def login():
     body = request.json
     user = User.query.filter_by(email=body["email"]).first()
-    profile = Profile.query.filter_by(user_id=user.id).first()
     if user is None or not bcrypt.check_password_hash(user.password, body["contraseña"]):
         return jsonify({"error": "Email o contraseña incorrectos!"}), 401
+    profile = Profile.query.filter_by(user_id=user.id).first()
     token = create_access_token(identity=str(user.id))
     return jsonify({"token": token, "user": user.serialize(), "profile": profile.serialize()}), 200
 
