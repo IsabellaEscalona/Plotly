@@ -66,7 +66,7 @@ export const Settings = () => {
 }
 
     return (
-        <div className="container py-5" style={{ maxWidth: '600px' }}>
+        <div className="container py-5" style={{ maxWidth: '600px', color: '#e0e0ff' }}>
             <h2 className="mb-4">Configuración de perfil</h2>
             {mensaje && <div className="alert alert-success">{mensaje}</div>}
             {error && <div className="alert alert-danger">{error}</div>}
