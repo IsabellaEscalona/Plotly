@@ -26,7 +26,7 @@ export const Settings = () => {
     if (!token) { setError("No hay sesión activa"); return }
     if (pass.actual || pass.nueva || pass.confirmar) {
         if (!pass.actual || !pass.nueva || !pass.confirmar) {
-            setError('Completá los tres campos de contraseña'); return
+            setError('Completa los tres campos de contraseña'); return
         }
         if (pass.nueva !== pass.confirmar) {
             setError('Las contraseñas nuevas no coinciden'); return

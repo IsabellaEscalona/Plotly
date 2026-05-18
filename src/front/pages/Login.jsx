@@ -34,7 +34,7 @@ export const Login = () => {
     return (
         <div
             className="d-flex justify-content-center align-items-center"
-            style={{ minHeight: "100vh", backgroundColor: "#12121f" }}>
+            style={{ minHeight: "100vh" }}>
             <div
                 className="p-4 rounded-4 shadow"
                 style={{ backgroundColor: "#1e1e2e", width: "100%", maxWidth: "420px" }}>
