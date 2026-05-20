@@ -39,10 +39,12 @@ export default function storeReducer(store, action = {}) {
   }    
 }*/
 
+/* -- probando sin import -- import { Profile } from "./pages/Profile" */
 export const initialStore = () => ({
     message: null,
     token: null,
-    user: null
+    user: null,
+    profile:null
 })
 
 export default function storeReducer(store, action = {}) {
@@ -53,8 +55,10 @@ export default function storeReducer(store, action = {}) {
             return { ...store, token: action.payload }
         case 'set_user':
             return { ...store, user: action.payload }
+        case 'set_profile':
+            return { ...store, profile:action.payload}
         case 'logout':
-            return { ...store, token: null, user: null }
+            return { ...store, token: null, user: null, profile: null }
         default:
             throw Error('Unknown action.')
     }

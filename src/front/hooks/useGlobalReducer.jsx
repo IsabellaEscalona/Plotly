@@ -1,6 +1,7 @@
 // Import necessary hooks and functions from React.
-import { useContext, useReducer, createContext } from "react";
+import { useContext, useReducer, createContext, useEffect } from "react";
 import storeReducer, { initialStore } from "../store"  // Import the reducer and the initial state.
+import { useNavigate } from "react-router-dom";
 
 // Create a context to hold the global state of the application
 // We will call this global state the "store" to avoid confusion while using local states
@@ -11,6 +12,48 @@ const StoreContext = createContext()
 export function StoreProvider({ children }) {
     // Initialize reducer with the initial state.
     const [store, dispatch] = useReducer(storeReducer, initialStore())
+
+    useEffect(() => {
+        checkCurrentUser()
+    }, [])
+
+    useEffect(() => {
+        getProfile()
+    }, [store?.token])
+
+
+    const checkCurrentUser = () => {
+        if (sessionStorage.getItem('token')) {
+            dispatch({ type: "set_token", payload: (sessionStorage.getItem('token')) })
+            dispatch({ type: "set_user", payload: JSON.parse(sessionStorage.getItem('user')) })
+            dispatch({ type: "set_profile", payload: JSON.parse(sessionStorage.getItem('profile')) })
+        }
+
+    }
+
+    const getProfile = async () => {
+
+        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/me', {
+
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${store.token}`
+            }
+
+        })
+
+        if (resp.status == 401) {
+
+            sessionStorage.removeItem('token')
+            sessionStorage.removeItem('user')
+
+        }
+
+
+    }
+
+
     // Provide the store and dispatch method to all child components.
     return <StoreContext.Provider value={{ store, dispatch }}>
         {children}

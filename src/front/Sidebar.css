@@ -1,0 +1,50 @@
+.plotly-sidebar {
+    width: 160px;
+    min-height: calc(100vh - 56px);
+    background-color: #1a1a2e;
+    border-right: 1px solid #2a2a45;
+    padding: 1.5rem 0;
+    flex-shrink: 0;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0 0.75rem;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    color: #a0a0c0;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.2s, color 0.2s;
+}
+
+.sidebar-link:hover {
+    background-color: #252540;
+    color: #e0e0ff;
+}
+
+.sidebar-link.active {
+    background-color: #2e2e55;
+    color: #c8b8ff;
+    font-weight: 600;
+}
+
+.sidebar-link i {
+    font-size: 1rem;
+    width: 18px;
+    text-align: center;
+}
+
+.sidebar-link.disabled-link {
+    color: #4a4a6a;
+    cursor: not-allowed;
+    pointer-events: none;
+}
