@@ -18,17 +18,41 @@ export const Profile = () => {
                                     <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"
                                         alt="generic placeholder image" className='img-fluid img-thumbnail rounded-circle mt-4 mb-2'
                                         style={{ 'zIndex': '1', 'height': '150px' }} />
-                                    <button 
-                                    onClick={() => navigate('/settings')}
-                                    type='button' 
-                                    className='btn btn-outline-dark text-body'
-                                    style={{ 'zIndex': '1' }}>
+                                    <button
+                                        onClick={() => navigate('/settings')}
+                                        type='button'
+                                        className='btn btn-outline-dark text-body'
+                                        style={{ 'zIndex': '1' }}>
                                         Edit Profile
                                     </button>
                                 </div>
-                                <div className="ms-3" style={{ 'marginTop': '130px' }}>
-                                    <h5>{store?.user?.username}</h5>
-                                    <p>{store?.profile?.artist_type}</p>
+                                <div className="ms-3" style={{ marginTop: '130px' }}>
+                                    <h5 className="mb-0">{store?.user?.username}</h5>
+                                    {store?.profile?.username_artistico && (
+                                        <p className="mb-0 text-secondary" style={{ fontSize: '0.9rem' }}>
+                                            {store.profile.username_artistico}
+                                        </p>
+                                    )}
+                                    {store?.profile?.tipo && (
+                                <span style={{
+                                    color: store.profile.tipo === 'Artista' ? '#1a6ebd' : '#ac5353',
+                                    fontSize: '0.85rem',
+                                    fontWeight: '600',
+                                }}>
+                                    <i className={`fa-solid me-1 ${store.profile.tipo === 'Artista' ? 'fa-pen-nib' : 'fa-book-open'}`} />
+                                    {store.profile.tipo}
+                                    {store.profile.tipo === 'Artista' && store.profile.artist_type && (
+                                        <span className="d-block" style={{ 
+                                            color: '#a0a0c0', 
+                                            fontSize: '0.8rem',
+                                            fontWeight: '400',
+                                        }}>
+                                            <i className="fa-solid me-1" style={{ fontSize: '0.6rem' }} />
+                                            {store.profile.artist_type}
+                                        </span>
+                                    )}
+                                </span>
+                            )}
                                 </div>
                             </div>
                             <div className="p-4 text-black bg-body-tertiary">
@@ -58,11 +82,11 @@ export const Profile = () => {
                                                 readOnly></textarea>
                                         </div>
                                         {store?.profile?.instagram && (
-                                            <p className="mb-1"><i class="fa-brands fa-instagram"></i> Instagram: <strong>{store.profile.instagram}</strong></p>
-                                            )}
+                                            <p className="mb-1"><i className="fa-brands fa-instagram"></i> Instagram: <strong>{store.profile.instagram}</strong></p>
+                                        )}
                                         {store?.profile?.twitter && (
-                                            <p className="mb-1"><i class="fa-brands fa-x-twitter"></i> Twitter: <strong>{store.profile.twitter}</strong></p>
-                                            )}
+                                            <p className="mb-1"><i className="fa-brands fa-x-twitter"></i> Twitter: <strong>{store.profile.twitter}</strong></p>
+                                        )}
                                     </div>
                                     <div className='col-8'>
                                         Post1

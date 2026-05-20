@@ -8,8 +8,10 @@ db = SQLAlchemy()
 
 follower = db.Table(
     'followers',
-    db.Column('users_followed', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('users_follower', db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    db.Column('users_followed', db.Integer,
+              db.ForeignKey('users.id'), primary_key=True),
+    db.Column('users_follower', db.Integer,
+              db.ForeignKey('users.id'), primary_key=True)
 )
 
 
@@ -27,7 +29,6 @@ class User(db.Model):
     def set_password(self, password):
         self.password = generate_password_hash(password)
 
-
     def serialize(self):
         return {
             "id": self.id,
@@ -36,13 +37,18 @@ class User(db.Model):
             # do not serialize the password, its a security breach
         }
 
-
 class Enum_Artist(enum.Enum):
     COMIC_ARTIST = 'comic artist'
     WRITER = 'Writer'
     HYBRID = 'Hybrid'
     READER = 'Reader'
 
+TIPO_MAP = {
+    Enum_Artist.COMIC_ARTIST: 'Artista',
+    Enum_Artist.WRITER: 'Artista',
+    Enum_Artist.HYBRID: 'Artista',
+    Enum_Artist.READER: 'Lector'
+}
 
 class Profile(db.Model):
     __tablename__ = 'profiles'
@@ -53,26 +59,29 @@ class Profile(db.Model):
     artist_type = db.Column(db.Enum(Enum_Artist), default=Enum_Artist.READER)
     instagram = db.Column(db.String(180), default=None)
     twitter = db.Column(db.String(180), default=None)
-    facebook = db.Column(db.String(180),default=None)
-    otros = db.Column(db.String(180),default=None)
+    facebook = db.Column(db.String(180), default=None)
+    otros = db.Column(db.String(180), default=None)
 
     def serialize(self):
         return {
             "id": self.id,
-            "user_id":self.user_id,
-            "profile_picture":self.profile_picture,
-            "bio":self.bio,
-            "artist_type":self.artist_type.value,
-            "instagram":self.instagram,
-            "twitter":self.twitter,
-            "facebook":self.facebook,
-            "otros":self.otros
+            "user_id": self.user_id,
+            "profile_picture": self.profile_picture,
+            "bio": self.bio,
+            "artist_type": self.artist_type.value if self.artist_type else None,
+            "tipo": TIPO_MAP.get(self.artist_type, 'Lector') if self.artist_type else None,
+            "instagram": self.instagram,
+            "twitter": self.twitter,
+            "facebook": self.facebook,
+            "otros": self.otros
             # do not serialize the password, its a security breach
         }
+
 
 class Enum_Category_Post(enum.Enum):
     ONLY_TEXT = 'only text'
     COMIC = 'comic'
+
 
 class Post(db.Model):
     __tablename__ = 'posts'
@@ -85,9 +94,8 @@ class Post(db.Model):
     content = db.relationship('Content_Post', backref='post')
 
     comment = db.relationship('Comment', backref='post')
-    
-    like = db.relationship('Like', backref='post')
 
+    like = db.relationship('Like', backref='post')
 
 
 class Enum_Type_Media(enum.Enum):
@@ -96,6 +104,7 @@ class Enum_Type_Media(enum.Enum):
     VIDEO = 'video'
     TEXT = 'text'
 
+
 class Content_Post(db.Model):
     __tablename__ = 'contents_posts'
     id = db.Column(db.Integer, primary_key=True)
@@ -103,12 +112,14 @@ class Content_Post(db.Model):
     type = db.Column(db.Enum(Enum_Type_Media))
     url = db.Column(db.String(200))
 
+
 class Comment(db.Model):
     __tablename__ = 'comments'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
     content = db.Column(db.String(1000))
+
 
 class Like(db.Model):
     __tablename__ = 'Likes'
