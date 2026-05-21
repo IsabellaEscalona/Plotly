@@ -9,8 +9,10 @@ db = SQLAlchemy()
 follower = db.Table(
     'followers',
     db.Column('users_followed', db.Integer,
+             
               db.ForeignKey('users.id'), primary_key=True),
     db.Column('users_follower', db.Integer,
+             
               db.ForeignKey('users.id'), primary_key=True)
 )
 
@@ -59,8 +61,8 @@ class Profile(db.Model):
     artist_type = db.Column(db.Enum(Enum_Artist), default=Enum_Artist.READER)
     instagram = db.Column(db.String(180), default=None)
     twitter = db.Column(db.String(180), default=None)
-    facebook = db.Column(db.String(180), default=None)
-    otros = db.Column(db.String(180), default=None)
+    facebook = db.Column(db.String(180),  default=None)
+    otros = db.Column(db.String(180),  default=None)
 
     def serialize(self):
         return {
@@ -83,34 +85,39 @@ class Enum_Category_Post(enum.Enum):
     COMIC = 'comic'
 
 
+class Enum_Genre_post(enum.Enum):
+    ACCION = 'Accion'
+    ROMANCE = 'Romamnce'
+    TERROR = 'Terror'
+    FANTASIA = 'Fantasia'
+    SCIFI = 'Sci-Fi'
+
+
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     title = db.Column(db.String(200))
     category = db.Column(db.Enum(Enum_Category_Post), nullable=False)
+    principal_genre = db.Column(db.Enum(Enum_Genre_post), nullable=False)
+    secondary_genre = db.Column(db.Enum(Enum_Genre_post))
     description = db.Column(db.String(1000))
+    cover = db.Column(db.String(200))
 
     content = db.relationship('Content_Post', backref='post')
 
     comment = db.relationship('Comment', backref='post')
 
+
     like = db.relationship('Like', backref='post')
-
-
-class Enum_Type_Media(enum.Enum):
-    GIF = 'gif'
-    IMAGE = 'image'
-    VIDEO = 'video'
-    TEXT = 'text'
 
 
 class Content_Post(db.Model):
     __tablename__ = 'contents_posts'
     id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
-    type = db.Column(db.Enum(Enum_Type_Media))
     url = db.Column(db.String(200))
+
 
 
 class Comment(db.Model):
@@ -119,6 +126,7 @@ class Comment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
     content = db.Column(db.String(1000))
+
 
 
 class Like(db.Model):

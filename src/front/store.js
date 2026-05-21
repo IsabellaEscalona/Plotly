@@ -44,7 +44,8 @@ export const initialStore = () => ({
     message: null,
     token: null,
     user: null,
-    profile:null
+    profile:null,
+    posts: null
 })
 
 export default function storeReducer(store, action = {}) {
@@ -57,6 +58,8 @@ export default function storeReducer(store, action = {}) {
             return { ...store, user: action.payload }
         case 'set_profile':
             return { ...store, profile:action.payload}
+        case 'set_post':
+            return { ...store, posts:action.payload}
         case 'logout':
             return { ...store, token: null, user: null, profile: null }
         default:
