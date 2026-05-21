@@ -116,3 +116,16 @@ def update_profile():
         "user": user.serialize(),
         "profile": profile.serialize()
     }), 200
+
+@api.route('/reset-password', methods= ['PUT'])
+def reset_password():
+    body = request.json
+    if not body.get("email") or not body.get("nueva_contraseña"):
+        return jsonify({"error": "Email y nueva contraseña son obligatorios"}), 400
+    user = User.query.filter_by(email=body["email"]).first()
+    if user is None:
+        return jsonify({"Error": "No existe una cuenta con el email ingresado"}), 404
+    hashed = bcrypt.generate_password_hash(body["nueva_contraseña"]).decode('utf-8')
+    user.password = hashed 
+    db.session.commit()
+    return jsonify({"message": "Contraseña restablecida correctamente!"}), 200
