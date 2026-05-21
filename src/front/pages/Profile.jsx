@@ -58,10 +58,10 @@ export const Profile = () => {
                                                 readOnly></textarea>
                                         </div>
                                         {store?.profile?.instagram && (
-                                            <p className="mb-1"><i class="fa-brands fa-instagram"></i> Instagram: <strong>{store.profile.instagram}</strong></p>
+                                            <p className="mb-2 my-2"><i class="fa-brands fa-instagram"></i> Instagram: <strong>{store.profile.instagram}</strong></p>
                                             )}
                                         {store?.profile?.twitter && (
-                                            <p className="mb-1"><i class="fa-brands fa-x-twitter"></i> Twitter: <strong>{store.profile.twitter}</strong></p>
+                                            <p className="mb-2 my-2"><i class="fa-brands fa-x-twitter"></i> Twitter: <strong>{store.profile.twitter}</strong></p>
                                             )}
                                     </div>
                                     <div className='col-8'>

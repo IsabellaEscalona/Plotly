@@ -14,7 +14,7 @@ export const Navbar = () => {
 	return (
 		<nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
 			<Link className="navbar-brand d-flex align-items-center gap-2" to="/">
-                <span style={{ fontSize: "1.5rem" }}><i class="fa-solid fa-cubes"></i></span>
+                <span style={{ fontSize: "1.5rem" }}><i className="fa-solid fa-cubes"></i></span>
                 <span className="fw-bold">Plotly</span>
             </Link>
 		<div className="dropdown ms-3">
