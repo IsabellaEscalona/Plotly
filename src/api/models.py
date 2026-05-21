@@ -9,8 +9,10 @@ db = SQLAlchemy()
 follower = db.Table(
     'followers',
     db.Column('users_followed', db.Integer,
+             
               db.ForeignKey('users.id'), primary_key=True),
     db.Column('users_follower', db.Integer,
+             
               db.ForeignKey('users.id'), primary_key=True)
 )
 
@@ -37,13 +39,18 @@ class User(db.Model):
             # do not serialize the password, its a security breach
         }
 
-
 class Enum_Artist(enum.Enum):
     COMIC_ARTIST = 'comic artist'
     WRITER = 'Writer'
     HYBRID = 'Hybrid'
     READER = 'Reader'
 
+TIPO_MAP = {
+    Enum_Artist.COMIC_ARTIST: 'Artista',
+    Enum_Artist.WRITER: 'Artista',
+    Enum_Artist.HYBRID: 'Artista',
+    Enum_Artist.READER: 'Lector'
+}
 
 class Profile(db.Model):
     __tablename__ = 'profiles'
@@ -54,8 +61,8 @@ class Profile(db.Model):
     artist_type = db.Column(db.Enum(Enum_Artist), default=Enum_Artist.READER)
     instagram = db.Column(db.String(180), default=None)
     twitter = db.Column(db.String(180), default=None)
-    facebook = db.Column(db.String(180), default=None)
-    otros = db.Column(db.String(180), default=None)
+    facebook = db.Column(db.String(180),  default=None)
+    otros = db.Column(db.String(180),  default=None)
 
     def serialize(self):
         return {
@@ -63,7 +70,8 @@ class Profile(db.Model):
             "user_id": self.user_id,
             "profile_picture": self.profile_picture,
             "bio": self.bio,
-            "artist_type": self.artist_type.value,
+            "artist_type": self.artist_type.value if self.artist_type else None,
+            "tipo": TIPO_MAP.get(self.artist_type, 'Lector') if self.artist_type else None,
             "instagram": self.instagram,
             "twitter": self.twitter,
             "facebook": self.facebook,
@@ -100,6 +108,7 @@ class Post(db.Model):
 
     comment = db.relationship('Comment', backref='post')
 
+
     like = db.relationship('Like', backref='post')
 
 
@@ -107,7 +116,8 @@ class Content_Post(db.Model):
     __tablename__ = 'contents_posts'
     id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
-    urls = db.Column(db.String(200))
+    url = db.Column(db.String(200))
+
 
 
 class Comment(db.Model):
@@ -116,6 +126,7 @@ class Comment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
     content = db.Column(db.String(1000))
+
 
 
 class Like(db.Model):

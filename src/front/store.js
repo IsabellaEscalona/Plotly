@@ -39,8 +39,7 @@ export default function storeReducer(store, action = {}) {
   }    
 }*/
 
-import { Profile } from "./pages/Profile"
-
+/* -- probando sin import -- import { Profile } from "./pages/Profile" */
 export const initialStore = () => ({
     message: null,
     token: null,
@@ -62,7 +61,7 @@ export default function storeReducer(store, action = {}) {
         case 'set_post':
             return { ...store, posts:action.payload}
         case 'logout':
-            return { ...store, token: null, user: null }
+            return { ...store, token: null, user: null, profile: null }
         default:
             throw Error('Unknown action.')
     }
