@@ -1,18 +1,76 @@
 import React, { useState, useEffect } from "react"
+import { useNavigate, Link } from "react-router-dom";
 import placeholderImage from '../assets/img/placeholder.jpg'
 import shortid from "https://esm.sh/shortid@2.2.16";
 import '../CreateComic.css'
+import useGlobalReducer from '../hooks/useGlobalReducer'
 
 export const CreateComic = () => {
+    const { store, dispatch } = useGlobalReducer()
+    const [error, setError] = useState('')
     const [preview, setPreview] = useState(placeholderImage)
-    const [file, setFile] = useState(null)
+    const [cover, setCover] = useState(null)
     const [selectedfile, SetSelectedFile] = useState([]);
-    const [Files, SetFiles] = useState([]);
+    const [Files, setFiles] = useState([]);
+    const [typePost, SetTypePost] = useState('comic')
+    const [title, setTitle] = useState('')
+    const [description, setDescription] = useState('')
+    const [principalGenre, setPrincipalGenre] = useState('')
+    const [secondaryGenre, setSecondaryGenre] = useState('')
+    const navigate = useNavigate()
+
+
+
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        setError('')
+        if (!title) {
+            setError('Por favor, escriba un titulo para su comic')
+            return;
+        }
+        else if (!principalGenre) {
+            setError('Elija un genero para su comic')
+            return;
+        }
+        else if (Files.length == 0) {
+            setError('Ponga el contenido de su comic')
+            return;
+        }
+
+        const formData = new FormData();
+                formData.append('title', title)
+                formData.append('typePost', typePost)
+                formData.append('description', description)
+                formData.append('PrincipalGenre', principalGenre)
+                formData.append('SecondaryGenre', secondaryGenre)
+                formData.append('Cover', cover)
+                formData.append('Files', Files)
+
+
+        register(formData)
+    }
+
+    const register = async (form) => {
+
+        console.log(form)
+        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/newComic', {
+            method: 'POST',
+            /*             headers: {
+                            'Content-Type': 'application/json'
+                        }, */
+            body: form
+        })
+            .then((Response) => Response.json())
+
+            .then((data) => console.log(data))
+    }
 
     const handleFileChangeCover = (e) => {
         const selectedFile = e.target.files[0]
+        console.log(selectedFile)
         if (selectedFile && selectedFile.type.startsWith('image/')) {
-            setFile(selectedFile)
+            setCover(selectedFile)
             const objectUrl = URL.createObjectURL(selectedFile)
             setPreview(objectUrl)
         }
@@ -41,6 +99,8 @@ export const CreateComic = () => {
                 reader.readAsDataURL(file);
             }
         }
+        setFiles([...Files, images])
+        /*  console.log(Files) */
     }
 
     const DeleteSelectFile = (id) => {
@@ -49,11 +109,6 @@ export const CreateComic = () => {
             SetSelectedFile(result);
         }
 
-    }
-
-    const Enum_Category_Post = {
-        ONLY_TEXT: 'only text',
-        COMIC: 'comic'
     }
 
     const Enum_Genre_post = {
@@ -72,46 +127,69 @@ export const CreateComic = () => {
         }
     }, [preview])
 
+        useEffect(() => {
+            const token = store.token || sessionStorage.getItem('token')
+    
+            if (!token) navigate('/login')
+    
+        }, [store.token])
+
 
     return (
-        <>
 
 
+         <form onSubmit={handleSubmit}>
             <div className="container py-5 text-align-center" style={{ maxWidth: '700px', color: '#e0e0ff' }}>
                 <h2 className="mb-4">Detalles de nueva historia</h2>
+                {error && <div className="alert alert-danger py-2">{error}</div>}
                 <div className="container d-flex">
+
                     <div className="col-4 justify-content-center">
                         <h5 className="pb-2">Portada</h5>
                         {preview && <img className="rounded rounded-2" src={preview} alt='Preview' style={{ 'width': '200px', 'height': '300px', 'objectFit': 'cover' }} />}
-                        <input className='form-control mt-1' type='file' accept='image/*' onChange={handleFileChangeCover} style={{ 'width': '200px' }} />
+                        <input className='form-control mt-1' type='file' accept='.jpg,.jpeg,.png,.webp' onChange={handleFileChangeCover} style={{ 'width': '200px' }} />
                     </div>
-                    <div className="col-9 mx-4">
-                        <input className="form-control my-3" type="text" placeholder="Título" />
-                        <textarea className="form-control my-4" name="descripcionPost"
-                            id="descripcionPost" placeholder="Descripción" rows={5}></textarea>
-                        {/*                         <select className="form-select my-4" aria-label="Default select example" defaultValue="">
-                            <option value='' disabled hidden>Seleccione el tipo de historia</option>
-                            <option value={Enum_Category_Post.ONLY_TEXT}>Solo texto</option>
-                            <option value={Enum_Category_Post.COMIC}>Comic</option>
-                        </select> */}
-                        <select className="form-select my-4" aria-label="Default select example" defaultValue="">
-                            <option value='' disabled hidden>Genero Principal</option>
-                            <option value={Enum_Genre_post.ACCION}>Acción</option>
-                            <option value={Enum_Genre_post.FANTASIA}>Fantasia</option>
-                            <option value={Enum_Genre_post.ROMANCE}>Romance</option>
-                            <option value={Enum_Genre_post.SCIFI}>Ciencia Ficción</option>
-                            <option value={Enum_Genre_post.TERROR}>Terror</option>
-                        </select>
-                        <select className="form-select mt-4 mb-2" aria-label="Default select example" defaultValue="">
-                            <option value='' disabled hidden>Genero Secundario</option>
-                            <option value={Enum_Genre_post.ACCION}>Acción</option>
-                            <option value={Enum_Genre_post.FANTASIA}>Fantasia</option>
-                            <option value={Enum_Genre_post.ROMANCE}>Romance</option>
-                            <option value={Enum_Genre_post.SCIFI}>Ciencia Ficción</option>
-                            <option value={Enum_Genre_post.TERROR}>Terror</option>
-                        </select>
 
-                    </div>
+                        <div className="col-9 mx-4">
+                            <input
+                                className="form-control my-3"
+                                type="text"
+                                placeholder="Título"
+                                value={title}
+                                onChange={e => setTitle(e.target.value)}
+                            />
+                            <textarea className="form-control my-4" name="descripcionPost"
+                                id="descripcionPost" placeholder="Descripción" rows={5} value={description} onChange={e => setDescription(e.target.value)}></textarea>
+                            <select
+                                className="form-select my-4"
+                                aria-label="Default select example"
+                                defaultValue=""
+                                value={principalGenre}
+                                onChange={e => setPrincipalGenre(e.target.value)}
+                            >
+                                <option value='' disabled hidden>Genero Principal</option>
+                                <option value={Enum_Genre_post.ACCION}>Acción</option>
+                                <option value={Enum_Genre_post.FANTASIA}>Fantasia</option>
+                                <option value={Enum_Genre_post.ROMANCE}>Romance</option>
+                                <option value={Enum_Genre_post.SCIFI}>Ciencia Ficción</option>
+                                <option value={Enum_Genre_post.TERROR}>Terror</option>
+                            </select>
+                            <select
+                                className="form-select mt-4 mb-2"
+                                aria-label="Default select example"
+                                defaultValue=""
+                                value={secondaryGenre}
+                                onChange={e => setSecondaryGenre(e.target.value)}
+                            >
+                                <option value='' disabled hidden>Genero Secundario</option>
+                                <option value={Enum_Genre_post.ACCION}>Acción</option>
+                                <option value={Enum_Genre_post.FANTASIA}>Fantasia</option>
+                                <option value={Enum_Genre_post.ROMANCE}>Romance</option>
+                                <option value={Enum_Genre_post.SCIFI}>Ciencia Ficción</option>
+                                <option value={Enum_Genre_post.TERROR}>Terror</option>
+                            </select>
+
+                        </div>
                 </div>
                 <div className="fileupload-view">
                     <div className="row justify-content-center ms-5">
@@ -126,7 +204,7 @@ export const CreateComic = () => {
                                         </div>
                                         <div className="kb-file-upload">
                                             <div className="file-upload-box">
-                                                <input type="file" id="fileupload" className="file-upload-input" onChange={handleFileChangeComic} multiple />
+                                                <input type="file" id="fileupload" className="file-upload-input" onChange={handleFileChangeComic} multiple accept='.jpg,.jpeg,.png,.webp' />
                                                 <span>Arrastrar y soltar o <span className="file-link">elija sus archivos</span></span>
                                             </div>
                                         </div>
@@ -136,11 +214,7 @@ export const CreateComic = () => {
                                                     const { id, filename, fileimage } = data;
                                                     return (
                                                         <div className="file-atc-box" key={id}>
-                                                            {
-                                                                filename.match(/.(jpg|jpeg|png|gif|svg)$/i) ?
-                                                                    <div className="file-image"> <img src={fileimage} alt="" /></div> :
-                                                                    <div className="file-image"><i className="far fa-file-alt"></i></div>
-                                                            }
+                                                            <div className="file-image"> <img src={fileimage} alt="" /></div>
                                                             <div className="file-detail">
                                                                 <h6>{filename}</h6>
                                                                 <p></p>
@@ -153,46 +227,17 @@ export const CreateComic = () => {
                                                 })
                                             }
                                         </div>
-                                        {Files.length > 0 ?
-                                            <div className="kb-attach-box">
-                                                <hr />
-                                                {
-                                                    Files.map((data, index) => {
-                                                        const { id, filename, fileimage } = data;
-                                                        return (
-                                                            <div className="file-atc-box" key={index}>
-                                                                {
-                                                                    filename.match(/.(jpg|jpeg|png|gif|svg)$/i) ?
-                                                                        <div className="file-image"> <img src={fileimage} alt="" /></div> :
-                                                                        <div className="file-image"><i className="far fa-file-alt"></i></div>
-                                                                }
-                                                                <div className="file-detail">
-                                                                    <h6>{filename}</h6>
-                                                                    <div className="file-actions">
-                                                                        <button className="file-action-btn" onClick={() => DeleteFile(id)}>Delete</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        )
-                                                    })
-                                                }
-                                            </div>
-                                            : ''}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <button className="btn btn-success m-1 ms-0">Crear</button>
-                <button className="btn btn-secondary m-1">Cancelar</button>
-            </div>
-
-
-
-
-
-        </>
+                <button type="submit" className="btn btn-success m-1 ms-0">Crear</button>
+            
+            <Link to='/'><button className="btn btn-secondary m-1">Cancelar</button></Link>
+        </div>
+    </form>
 
     )
 

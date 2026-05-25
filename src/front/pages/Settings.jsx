@@ -5,7 +5,7 @@ import useGlobalReducer from '../hooks/useGlobalReducer'
 export const Settings = () => {
     const { store, dispatch } = useGlobalReducer()
     const navigate = useNavigate()
-    const [form, setForm] = useState({ username: '', email: '', bio: '', instagram: '', twitter: '', tipo: '', tipo: '', artistType: '' })
+    const [form, setForm] = useState({ username: '', email: '', bio: '', instagram: '', twitter: '', tipo: '', artistType: '' })
     const [pass, setPass] = useState({ actual: '', nueva: '', confirmar: '' })
     const [mensaje, setMensaje] = useState('')
     const [error, setError] = useState('')
