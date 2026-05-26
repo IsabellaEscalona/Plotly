@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from "react-router-dom"
 import useGlobalReducer from '../hooks/useGlobalReducer'
 import "./Profile.css"
@@ -15,7 +15,10 @@ export const Profile = () => {
     const { store } = useGlobalReducer()
     const navigate = useNavigate()
     const [bioExpandida, setBioExpandida] = useState(false)
-
+    useEffect(() => {
+        const token = store.token || sessionStorage.getItem('token')
+        if (!token) navigate('/login')
+    }, [store.token])
     const bio = store?.profile?.bio || "Sin bio todavía..."
     const bioCorta = bio.length > 120 ? bio.slice(0, 120) + "..." : bio
 
