@@ -48,7 +48,7 @@ def signup():
         artist_type = subtipo_map.get(body.get('artist_type', 'Hybrid'), Enum_Artist.HYBRID)
     new_profile = Profile(user_id=new_user.id, artist_type=artist_type)
     db.session.add(new_profile)
-    db.session.commit()
+    db.session.commit33()
     return jsonify({"message": "Usuario creado correctamente!"}), 200
 
 
@@ -129,3 +129,8 @@ def reset_password():
     user.password = hashed 
     db.session.commit()
     return jsonify({"message": "Contraseña restablecida correctamente!"}), 200
+
+@api.route('/newComic', methods= ['POST'])
+def newComic():
+    print('hola')
+    return jsonify({'status':'ok'}),200

@@ -97,7 +97,7 @@ class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    title = db.Column(db.String(200))
+    title = db.Column(db.String(200), nullable=False)
     category = db.Column(db.Enum(Enum_Category_Post), nullable=False)
     principal_genre = db.Column(db.Enum(Enum_Genre_post), nullable=False)
     secondary_genre = db.Column(db.Enum(Enum_Genre_post))
@@ -116,7 +116,7 @@ class Content_Post(db.Model):
     __tablename__ = 'contents_posts'
     id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
-    url = db.Column(db.String(200))
+    url = db.Column(db.String(200), nullable=False)
 
 
 

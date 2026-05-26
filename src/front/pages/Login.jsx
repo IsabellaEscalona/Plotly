@@ -43,7 +43,7 @@ export const Login = () => {
                         <i className="fa-solid fa-cubes"></i>
                     </span>
                     <h4 className="text-white fw-bold mt-1">Plotly</h4>
-                    <p className="text-secondary mb-0">Iniciá sesión</p>
+                    <p className="text-secondary mb-0">Iniciar sesión</p>
                 </div>
                 {error && <div className="alert alert-danger py-2">{error}</div>}
                 <div className="mb-3">
@@ -67,10 +67,14 @@ export const Login = () => {
                 <button className="btn btn-primary w-100 fw-bold" onClick={handleLogin}>
                     Entrar
                 </button>
+                <p className="text-center">
+                    <Link to="/reset-password" style={{ color: "gray" }}>¿Olvidaste tu contraseña?</Link>
+                </p>
                 <p className="text-center text-secondary mt-3 mb-0" style={{ fontSize: "0.9rem" }}>
                     ¿No tienes cuenta?{" "}
                     <Link to="/signup">Regístrate</Link>
                 </p>
+
             </div>
         </div>
     )
