@@ -1,0 +1,21 @@
+.obra-card {
+    background-color: #1e1e2e;
+    border: 1px solid #2a2a45;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+    max-width: 160px;
+}
+
+.obra-card:hover {
+    transform: translateY(-3px);
+    border-color: #5a5a9a;
+}
+
+.obra-portada {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    display: block;
+}

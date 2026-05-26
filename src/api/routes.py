@@ -48,7 +48,7 @@ def signup():
         artist_type = subtipo_map.get(body.get('artist_type', 'Hybrid'), Enum_Artist.HYBRID)
     new_profile = Profile(user_id=new_user.id, artist_type=artist_type)
     db.session.add(new_profile)
-    db.session.commit33()
+    db.session.commit()
     return jsonify({"message": "Usuario creado correctamente!"}), 200
 
 
