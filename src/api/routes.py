@@ -2,7 +2,9 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Profile, Enum_Artist, TIPO_MAP
+import cloudinary
+import cloudinary.uploader
+from api.models import db, User, Profile, Enum_Artist, TIPO_MAP, Post, Enum_Genre_post, Enum_Category_Post, Content_Post
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -33,7 +35,8 @@ def signup():
     if existing_user:
         return jsonify({"error": "User already exists"}), 400
     hashed = bcrypt.generate_password_hash(body["contraseña"]).decode('utf-8')
-    new_user = User(email=body["email"], password=hashed, username=body["usuario"])
+    new_user = User(email=body["email"],
+                    password=hashed, username=body["usuario"])
     db.session.add(new_user)
     db.session.flush()
     tipo_recibido = body.get('tipo', 'Lector')
@@ -45,7 +48,8 @@ def signup():
             'Writer': Enum_Artist.WRITER,
             'Hybrid': Enum_Artist.HYBRID
         }
-        artist_type = subtipo_map.get(body.get('artist_type', 'Hybrid'), Enum_Artist.HYBRID)
+        artist_type = subtipo_map.get(
+            body.get('artist_type', 'Hybrid'), Enum_Artist.HYBRID)
     new_profile = Profile(user_id=new_user.id, artist_type=artist_type)
     db.session.add(new_profile)
     db.session.commit()
@@ -61,6 +65,7 @@ def login():
     profile = Profile.query.filter_by(user_id=user.id).first()
     token = create_access_token(identity=str(user.id))
     return jsonify({"token": token, "user": user.serialize(), "profile": profile.serialize()}), 200
+
 
 @api.route('/me', methods=['GET'])
 @jwt_required()
@@ -85,7 +90,8 @@ def change_password():
     user = User.query.get(user_id)
     if not bcrypt.check_password_hash(user.password, body["contraseña_actual"]):
         return jsonify({"error": "Contraseña actual equivocada, prueba de nuevo!"}), 401
-    hashed = bcrypt.generate_password_hash(body["nueva_contraseña"]).decode('utf-8')
+    hashed = bcrypt.generate_password_hash(
+        body["nueva_contraseña"]).decode('utf-8')
     user.password = hashed
     db.session.commit()
     return jsonify({"message": "Contraseña actualizada :)"}), 200
@@ -102,22 +108,25 @@ def update_profile():
     user.email = body.get("email", user.email)
 
     if body.get("password"):
-        user.password = bcrypt.generate_password_hash(body["password"]).decode('utf-8')
+        user.password = bcrypt.generate_password_hash(
+            body["password"]).decode('utf-8')
 
     profile.bio = body.get("bio", profile.bio)
     profile.instagram = body.get("instagram", profile.instagram)
     profile.twitter = body.get("twitter", profile.twitter)
     if body.get("tipo"):
-        profile.artist_type = Enum_Artist.COMIC_ARTIST if body["tipo"] == 'Artista' else Enum_Artist.READER
+        profile.artist_type = Enum_Artist.COMIC_ARTIST if body[
+            "tipo"] == 'Artista' else Enum_Artist.READER
 
     db.session.commit()
-    return jsonify({          
+    return jsonify({
         "message": "perfil actualizado correctamente",
         "user": user.serialize(),
         "profile": profile.serialize()
     }), 200
 
-@api.route('/reset-password', methods= ['PUT'])
+
+@api.route('/reset-password', methods=['PUT'])
 def reset_password():
     body = request.json
     if not body.get("email") or not body.get("nueva_contraseña"):
@@ -125,12 +134,84 @@ def reset_password():
     user = User.query.filter_by(email=body["email"]).first()
     if user is None:
         return jsonify({"Error": "No existe una cuenta con el email ingresado"}), 404
-    hashed = bcrypt.generate_password_hash(body["nueva_contraseña"]).decode('utf-8')
-    user.password = hashed 
+    hashed = bcrypt.generate_password_hash(
+        body["nueva_contraseña"]).decode('utf-8')
+    user.password = hashed
     db.session.commit()
     return jsonify({"message": "Contraseña restablecida correctamente!"}), 200
 
-@api.route('/newComic', methods= ['POST'])
+
+@api.route('/newComic', methods=['POST'])
+@jwt_required()
 def newComic():
-    print('hola')
-    return jsonify({'status':'ok'}),200
+    body = request.form
+    user_id = get_jwt_identity()
+    if not body.get('title'):
+        return jsonify({'status': 'error', 'message': 'El titulo es obligatorio'}), 400
+    if not body.get('principal_genre'):
+        return jsonify({'status': 'error', 'message': 'El genero principal es obligatorio'}), 400
+    if not body.get('files'):
+        return jsonify({'status': 'error', 'message': 'Los archivos son obligatorios'}), 400
+
+    title = body['title']
+    category = Enum_Category_Post.COMIC
+
+    primer_tipo_recibido = body['principal_genre']
+
+    if primer_tipo_recibido == 'Accion':
+        principal_genre = Enum_Genre_post.ACCION
+    if primer_tipo_recibido == 'Romance':
+        principal_genre = Enum_Genre_post.ROMANCE
+    if primer_tipo_recibido == 'Terror':
+        principal_genre = Enum_Genre_post.TERROR
+    if primer_tipo_recibido == 'Fantasia':
+        principal_genre = Enum_Genre_post.FANTASIA
+    if primer_tipo_recibido == 'Sci-Fi':
+        principal_genre = Enum_Genre_post.SCIFI
+
+    segundo_tipo_recibido = body['secondary_genre']
+
+    if segundo_tipo_recibido == 'Accion':
+        secondary_genre = Enum_Genre_post.ACCION
+    if segundo_tipo_recibido == 'Romance':
+        secondary_genre = Enum_Genre_post.ROMANCE
+    if segundo_tipo_recibido == 'Terror':
+        secondary_genre = Enum_Genre_post.TERROR
+    if segundo_tipo_recibido == 'Fantasia':
+        secondary_genre = Enum_Genre_post.FANTASIA
+    if segundo_tipo_recibido == 'Sci-Fi':
+        secondary_genre = Enum_Genre_post.SCIFI
+
+    description = body['description']
+    cover = request.files['cover']
+
+    result = cloudinary.uploader.upload(cover, folder='covers')
+
+    if result:
+
+        new_Post= Post(user_id=user_id, title=title, category=category, principal_genre=principal_genre, 
+                       secondary_genre=secondary_genre, description=description, cover=result['secure_url'])
+        
+        db.session.add(new_Post)
+        db.session.flush()
+        
+        files = request.files.getlist('files')
+        print(files)
+        result_files=[]
+
+        for file in files:
+            try:
+                response=cloudinary.uploader.upload(file, folder='files')
+
+                result_files.append(response['secure_url'])
+            except Exception as e:
+                return jsonify({'message':'Hubo un error al subir el contenido del comic ' + {e}}), 400
+            
+        new_content_post= Content_Post(post_id=new_Post.id, url=result_files)
+        db.session.add(new_content_post)
+        db.session.commit()
+
+        return jsonify({'message':'Post creado exito'}), 200
+    
+    else:
+        return jsonify({'message':'Post no creado'}), 500
