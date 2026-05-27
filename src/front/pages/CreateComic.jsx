@@ -47,9 +47,15 @@ export const CreateComic = () => {
         formData.append('principal_genre', principalGenre)
         formData.append('secondary_genre', secondaryGenre)
         formData.append('cover', cover)
-        formData.append('files', files)
 
-        console.log(formData)
+        for (let content of files) {
+
+            formData.append('content[]', content)
+        }
+
+        for (let pair of formData.entries()) {
+            console.log(pair[0], pair[1]);
+        }
 
         register(formData)
     }
@@ -57,10 +63,9 @@ export const CreateComic = () => {
     const register = (form) => {
 
         const token = store.token || sessionStorage.getItem("token")
-        console.log(form)
         const resp = fetch(import.meta.env.VITE_BACKEND_URL + '/api/newComic', {
             method: 'POST',
-            headers: {'Authorization': 'Bearer ' + token},
+            headers: { 'Authorization': 'Bearer ' + token },
             body: form
         })
             .then((Response) => Response.json())
@@ -100,7 +105,7 @@ export const CreateComic = () => {
                 reader.readAsDataURL(file);
             }
         }
-        setFiles([...files, images])
+        setFiles(images)
     }
 
     const DeleteSelectFile = (id) => {
@@ -127,20 +132,20 @@ export const CreateComic = () => {
         }
     }, [preview])
 
-        useEffect(() => {
-            const token = store.token || sessionStorage.getItem('token')
-    
-            if (!token) navigate('/login')
-    
-        }, [store.token])
+    useEffect(() => {
+        const token = store.token || sessionStorage.getItem('token')
+
+        if (!token) navigate('/login')
+
+    }, [store.token])
 
 
     return (
 
 
-         <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
             <div className="container py-5 text-align-center" style={{ maxWidth: '700px', color: '#e0e0ff' }}>
-                <h2 className="mb-4">Detalles de nueva historia</h2>
+                <h2 className="mb-4">Detalles de nueva comic</h2>
                 {error && <div className="alert alert-danger py-2">{error}</div>}
                 <div className="container d-flex">
 
@@ -150,47 +155,47 @@ export const CreateComic = () => {
                         <input className='form-control mt-1' type='file' accept='.jpg,.jpeg,.png,.webp' onChange={handleFileChangeCover} style={{ 'width': '200px' }} />
                     </div>
 
-                        <div className="col-9 mx-4">
-                            <input
-                                className="form-control my-3"
-                                type="text"
-                                placeholder="Título"
-                                name="title"
-                                value={title}
-                                onChange={e => setTitle(e.target.value)}
-                            />
-                            <textarea className="form-control my-4" name="descripcionPost"
-                                id="descripcionPost" placeholder="Descripción" rows={5} value={description} onChange={e => setDescription(e.target.value)}></textarea>
-                            <select
-                                className="form-select my-4"
-                                aria-label="Default select example"
-                                defaultValue=""
-                                value={principalGenre}
-                                onChange={e => setPrincipalGenre(e.target.value)}
-                            >
-                                <option value='' disabled hidden>Genero Principal</option>
-                                <option value={Enum_Genre_post.ACCION}>Acción</option>
-                                <option value={Enum_Genre_post.FANTASIA}>Fantasia</option>
-                                <option value={Enum_Genre_post.ROMANCE}>Romance</option>
-                                <option value={Enum_Genre_post.SCIFI}>Ciencia Ficción</option>
-                                <option value={Enum_Genre_post.TERROR}>Terror</option>
-                            </select>
-                            <select
-                                className="form-select mt-4 mb-2"
-                                aria-label="Default select example"
-                                defaultValue=""
-                                value={secondaryGenre}
-                                onChange={e => setSecondaryGenre(e.target.value)}
-                            >
-                                <option value='' disabled hidden>Genero Secundario</option>
-                                <option value={Enum_Genre_post.ACCION}>Acción</option>
-                                <option value={Enum_Genre_post.FANTASIA}>Fantasia</option>
-                                <option value={Enum_Genre_post.ROMANCE}>Romance</option>
-                                <option value={Enum_Genre_post.SCIFI}>Ciencia Ficción</option>
-                                <option value={Enum_Genre_post.TERROR}>Terror</option>
-                            </select>
+                    <div className="col-9 mx-4">
+                        <input
+                            className="form-control my-3"
+                            type="text"
+                            placeholder="Título"
+                            name="title"
+                            value={title}
+                            onChange={e => setTitle(e.target.value)}
+                        />
+                        <textarea className="form-control my-4" name="descripcionPost"
+                            id="descripcionPost" placeholder="Descripción" rows={5} value={description} onChange={e => setDescription(e.target.value)}></textarea>
+                        <select
+                            className="form-select my-4"
+                            aria-label="Default select example"
+                            defaultValue=""
+                            value={principalGenre}
+                            onChange={e => setPrincipalGenre(e.target.value)}
+                        >
+                            <option value='' disabled hidden>Genero Principal</option>
+                            <option value={Enum_Genre_post.ACCION}>Acción</option>
+                            <option value={Enum_Genre_post.FANTASIA}>Fantasia</option>
+                            <option value={Enum_Genre_post.ROMANCE}>Romance</option>
+                            <option value={Enum_Genre_post.SCIFI}>Ciencia Ficción</option>
+                            <option value={Enum_Genre_post.TERROR}>Terror</option>
+                        </select>
+                        <select
+                            className="form-select mt-4 mb-2"
+                            aria-label="Default select example"
+                            defaultValue=""
+                            value={secondaryGenre}
+                            onChange={e => setSecondaryGenre(e.target.value)}
+                        >
+                            <option value='' disabled hidden>Genero Secundario</option>
+                            <option value={Enum_Genre_post.ACCION}>Acción</option>
+                            <option value={Enum_Genre_post.FANTASIA}>Fantasia</option>
+                            <option value={Enum_Genre_post.ROMANCE}>Romance</option>
+                            <option value={Enum_Genre_post.SCIFI}>Ciencia Ficción</option>
+                            <option value={Enum_Genre_post.TERROR}>Terror</option>
+                        </select>
 
-                        </div>
+                    </div>
                 </div>
                 <div className="fileupload-view">
                     <div className="row justify-content-center ms-5">
@@ -235,10 +240,10 @@ export const CreateComic = () => {
                     </div>
                 </div>
                 <button type="submit" className="btn btn-success m-1 ms-0">Crear</button>
-            
-            <Link to='/'><button className="btn btn-secondary m-1">Cancelar</button></Link>
-        </div>
-    </form>
+
+                <Link to='/'><button className="btn btn-secondary m-1">Cancelar</button></Link>
+            </div>
+        </form>
 
     )
 
