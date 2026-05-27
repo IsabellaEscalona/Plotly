@@ -145,12 +145,13 @@ def reset_password():
 @jwt_required()
 def newComic():
     body = request.form
+    print(request.files)
     user_id = get_jwt_identity()
     if not body.get('title'):
         return jsonify({'status': 'error', 'message': 'El titulo es obligatorio'}), 400
     if not body.get('principal_genre'):
         return jsonify({'status': 'error', 'message': 'El genero principal es obligatorio'}), 400
-    if not body.get('files'):
+    if not 'content[]' in request.files:
         return jsonify({'status': 'error', 'message': 'Los archivos son obligatorios'}), 400
 
     title = body['title']
@@ -195,20 +196,22 @@ def newComic():
         db.session.add(new_Post)
         db.session.flush()
         
-        files = request.files.getlist('files')
+        files = request.files.getlist('content[]')
         print(files)
-        result_files=[]
+        result_files=''
 
         for file in files:
             try:
                 response=cloudinary.uploader.upload(file, folder='files')
+                print(response['secure_url'])
+                result_files=response['secure_url']
+                new_content_post= Content_Post(post_id=new_Post.id, url=result_files)
+                db.session.add(new_content_post)
+                db.session.flush()
 
-                result_files.append(response['secure_url'])
             except Exception as e:
-                return jsonify({'message':'Hubo un error al subir el contenido del comic ' + {e}}), 400
+                return jsonify({'message':'Hubo un error al subir el contenido del comic '}), 400
             
-        new_content_post= Content_Post(post_id=new_Post.id, url=result_files)
-        db.session.add(new_content_post)
         db.session.commit()
 
         return jsonify({'message':'Post creado exito'}), 200
