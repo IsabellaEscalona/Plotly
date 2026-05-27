@@ -210,7 +210,7 @@ def newComic():
                 db.session.flush()
 
             except Exception as e:
-                return jsonify({'message':'Hubo un error al subir el contenido del comic '}), 400
+                return jsonify({'message':'Hubo un error al subir el contenido del comic'}), 400
             
         db.session.commit()
 
