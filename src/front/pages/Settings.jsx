@@ -12,7 +12,10 @@ export const Settings = () => {
 
     useEffect(() => {
         const token = store.token || sessionStorage.getItem("token")
-        if (!token) return
+        if (!token) {
+            navigate('/login')
+            return
+        }
         fetch(import.meta.env.VITE_BACKEND_URL + '/api/me', {
             headers: { 'Authorization': 'Bearer ' + token }
         }).then(r => r.json()).then(data => setForm({
@@ -121,32 +124,32 @@ export const Settings = () => {
                         ))}
                     </div>
                     {form.tipo === 'Artista' && (
-                    <div className="col-12 mt-2">
-                        <label className="form-label">Tipo de artista</label>
-                        <div className="d-flex gap-2">
-                            {[
-                                { valor: 'Comic Artist', icono: 'fa-image' },
-                                { valor: 'Writer', icono: 'fa-feather' },
-                                { valor: 'Hybrid', icono: 'fa-layer-group' }
-                            ].map(({ valor, icono }) => (
-                                <div
-                                    key={valor}
-                                    onClick={() => setForm({ ...form, artistType: valor })}
-                                    className="flex-fill text-center p-2 rounded-3"
-                                    style={{
-                                        cursor: 'pointer',
-                                        border: `2px solid ${form.artistType === valor ? '#1a6ebd' : '#6c757d'}`,
-                                        backgroundColor: form.artistType === valor ? '#1a6ebd22' : 'transparent',
-                                        color: form.artistType === valor ? '#1a6ebd' : '#adb5bd',
-                                        transition: 'all 0.2s'
-                                    }}>
-                                    <i className={`fa-solid ${icono}`} style={{ fontSize: '1.2rem' }} />
-                                    <div className="fw-bold mt-1" style={{ fontSize: '0.8rem' }}>{valor}</div>
-                                </div>
-                            ))}
+                        <div className="col-12 mt-2">
+                            <label className="form-label">Tipo de artista</label>
+                            <div className="d-flex gap-2">
+                                {[
+                                    { valor: 'Comic Artist', icono: 'fa-image' },
+                                    { valor: 'Writer', icono: 'fa-feather' },
+                                    { valor: 'Hybrid', icono: 'fa-layer-group' }
+                                ].map(({ valor, icono }) => (
+                                    <div
+                                        key={valor}
+                                        onClick={() => setForm({ ...form, artistType: valor })}
+                                        className="flex-fill text-center p-2 rounded-3"
+                                        style={{
+                                            cursor: 'pointer',
+                                            border: `2px solid ${form.artistType === valor ? '#1a6ebd' : '#6c757d'}`,
+                                            backgroundColor: form.artistType === valor ? '#1a6ebd22' : 'transparent',
+                                            color: form.artistType === valor ? '#1a6ebd' : '#adb5bd',
+                                            transition: 'all 0.2s'
+                                        }}>
+                                        <i className={`fa-solid ${icono}`} style={{ fontSize: '1.2rem' }} />
+                                        <div className="fw-bold mt-1" style={{ fontSize: '0.8rem' }}>{valor}</div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
                 </div>
                 <div className="col-12"><hr /></div>
                 <div className="col-12">

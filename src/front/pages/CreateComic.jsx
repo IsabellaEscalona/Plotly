@@ -11,7 +11,7 @@ export const CreateComic = () => {
     const [preview, setPreview] = useState(placeholderImage)
     const [cover, setCover] = useState(null)
     const [selectedfile, SetSelectedFile] = useState([]);
-    const [Files, setFiles] = useState([]);
+    const [files, setFiles] = useState([]);
     const [typePost, SetTypePost] = useState('comic')
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
@@ -33,32 +33,34 @@ export const CreateComic = () => {
             setError('Elija un genero para su comic')
             return;
         }
-        else if (Files.length == 0) {
+        else if (files.length == 0) {
             setError('Ponga el contenido de su comic')
             return;
         }
 
-        const formData = new FormData();
-                formData.append('title', title)
-                formData.append('typePost', typePost)
-                formData.append('description', description)
-                formData.append('PrincipalGenre', principalGenre)
-                formData.append('SecondaryGenre', secondaryGenre)
-                formData.append('Cover', cover)
-                formData.append('Files', Files)
+        console.log(files)
 
+        const formData = new FormData();
+        formData.append('title', title)
+        formData.append('typePost', typePost)
+        formData.append('description', description)
+        formData.append('principal_genre', principalGenre)
+        formData.append('secondary_genre', secondaryGenre)
+        formData.append('cover', cover)
+        formData.append('files', files)
+
+        console.log(formData)
 
         register(formData)
     }
 
-    const register = async (form) => {
+    const register = (form) => {
 
+        const token = store.token || sessionStorage.getItem("token")
         console.log(form)
-        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/newComic', {
+        const resp = fetch(import.meta.env.VITE_BACKEND_URL + '/api/newComic', {
             method: 'POST',
-            /*             headers: {
-                            'Content-Type': 'application/json'
-                        }, */
+            headers: {'Authorization': 'Bearer ' + token},
             body: form
         })
             .then((Response) => Response.json())
@@ -68,7 +70,6 @@ export const CreateComic = () => {
 
     const handleFileChangeCover = (e) => {
         const selectedFile = e.target.files[0]
-        console.log(selectedFile)
         if (selectedFile && selectedFile.type.startsWith('image/')) {
             setCover(selectedFile)
             const objectUrl = URL.createObjectURL(selectedFile)
@@ -99,8 +100,7 @@ export const CreateComic = () => {
                 reader.readAsDataURL(file);
             }
         }
-        setFiles([...Files, images])
-        /*  console.log(Files) */
+        setFiles([...files, images])
     }
 
     const DeleteSelectFile = (id) => {
@@ -113,7 +113,7 @@ export const CreateComic = () => {
 
     const Enum_Genre_post = {
         ACCION: 'Accion',
-        ROMANCE: 'Romamnce',
+        ROMANCE: 'Romance',
         TERROR: 'Terror',
         FANTASIA: 'Fantasia',
         SCIFI: 'Sci-Fi'
@@ -155,6 +155,7 @@ export const CreateComic = () => {
                                 className="form-control my-3"
                                 type="text"
                                 placeholder="Título"
+                                name="title"
                                 value={title}
                                 onChange={e => setTitle(e.target.value)}
                             />

@@ -9,10 +9,10 @@ db = SQLAlchemy()
 follower = db.Table(
     'followers',
     db.Column('users_followed', db.Integer,
-             
+
               db.ForeignKey('users.id'), primary_key=True),
     db.Column('users_follower', db.Integer,
-             
+
               db.ForeignKey('users.id'), primary_key=True)
 )
 
@@ -39,11 +39,13 @@ class User(db.Model):
             # do not serialize the password, its a security breach
         }
 
+
 class Enum_Artist(enum.Enum):
     COMIC_ARTIST = 'comic artist'
     WRITER = 'Writer'
     HYBRID = 'Hybrid'
     READER = 'Reader'
+
 
 TIPO_MAP = {
     Enum_Artist.COMIC_ARTIST: 'Artista',
@@ -51,6 +53,7 @@ TIPO_MAP = {
     Enum_Artist.HYBRID: 'Artista',
     Enum_Artist.READER: 'Lector'
 }
+
 
 class Profile(db.Model):
     __tablename__ = 'profiles'
@@ -87,7 +90,7 @@ class Enum_Category_Post(enum.Enum):
 
 class Enum_Genre_post(enum.Enum):
     ACCION = 'Accion'
-    ROMANCE = 'Romamnce'
+    ROMANCE = 'Romance'
     TERROR = 'Terror'
     FANTASIA = 'Fantasia'
     SCIFI = 'Sci-Fi'
@@ -104,10 +107,22 @@ class Post(db.Model):
     description = db.Column(db.String(1000))
     cover = db.Column(db.String(200))
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            'title': self.title,
+            'category':self.category,
+            'principal_genre':self.principal_genre,
+            'secondary_genre':self.secondary_genre,
+            'description':self.description,
+            'cover':self.cover
+            # do not serialize the password, its a security breach
+        }
+
     content = db.relationship('Content_Post', backref='post')
 
     comment = db.relationship('Comment', backref='post')
-
 
     like = db.relationship('Like', backref='post')
 
@@ -119,14 +134,12 @@ class Content_Post(db.Model):
     url = db.Column(db.String(200), nullable=False)
 
 
-
 class Comment(db.Model):
     __tablename__ = 'comments'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
     content = db.Column(db.String(1000))
-
 
 
 class Like(db.Model):
