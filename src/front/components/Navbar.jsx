@@ -32,15 +32,15 @@ export const Navbar = () => {
             <div className="mx-auto">
                 <input className="form-control" type="search" placeholder="Buscar..." />
             </div>
-            {/* deshabilitado, primero hay que desarrollar bien el subir archivos */}
+            {/* ddisponible cómic, falta escritura */}
             <div className="dropdown ms-3">
-                <button className="btn btn-dark dropdown-toggle">
+                <button className="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown">
                     Subir
                 </button>
-                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <li><Link className="dropdown-item" to="/newComic">Mi Perfil</Link></li>
+                <ul className="dropdown-menu">
+                    <li><Link className="dropdown-item" to="/newComic">Cómic</Link></li>
+                    <li><a className="dropdown-item disabled" href="#">Escritura</a></li>
                 </ul>
-
             </div>
             <div className="dropdown ms-3">
                 <button className="btn btn-dark dropdown-toggle d-flex align-items-center gap-2" data-bs-toggle="dropdown">
