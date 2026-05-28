@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
+import { useState } from "react";
 
 export const Navbar = () => {
     const { store, dispatch } = useGlobalReducer();
@@ -10,6 +11,18 @@ export const Navbar = () => {
         sessionStorage.clear();
         navigate("/login");
     };
+
+    const [query, setQuery] = useState("")
+    const [results, setResults] = useState([])
+    const [showResults, setShowResults] = useState(true)
+    const handleSearch = async (e) => {
+        const value = e.target.value
+        setQuery(value)
+        if (value.length < 3) { setResults([]); return }
+        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/search-books?q=" + value)
+        const data = await resp.json()
+        setResults(data)
+    }
 
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
@@ -29,9 +42,26 @@ export const Navbar = () => {
                     <li><a className="dropdown-item">Ciencia Ficción</a></li>
                 </ul>
             </div>
-            <div className="mx-auto">
-                <input className="form-control" type="search" placeholder="Buscar..." />
+
+
+            <div className="mx-auto position-relative">
+                <input className="form-control" type="search" placeholder="Buscar libros..."
+                    value={query} onChange={handleSearch}
+                    onBlur={() => setTimeout(() => setShowResults(false), 200)}
+                    onFocus={() => setShowResults(true)}
+                />
+                {results.length > 0 && showResults && (
+                    <ul className="list-group position-absolute w-100" style={{ zIndex: 1000 }}>
+                        {results.slice(0, 5).map((book, i) => (
+                            <li key={i} className="list-group-item d-flex align-items-center gap-2">
+                                {book.cover && <img src={book.cover} style={{ height: "40px" }} />}
+                                <span>{book.title} - {book.author}</span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
+
             {/* ddisponible cómic, falta escritura */}
             <div className="dropdown ms-3">
                 <button className="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown">
