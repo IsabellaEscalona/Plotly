@@ -5,7 +5,7 @@ import shortid from "https://esm.sh/shortid@2.2.16";
 import '../CreateComic.css'
 import useGlobalReducer from '../hooks/useGlobalReducer'
 
-export const CreateComic = () => {
+export const CreateHistory = () => {
     const { store, dispatch } = useGlobalReducer()
     const [error, setError] = useState('')
     const [preview, setPreview] = useState(placeholderImage)
@@ -25,15 +25,15 @@ export const CreateComic = () => {
         e.preventDefault()
         setError('')
         if (!title) {
-            setError('Por favor, escriba un titulo para su comic')
+            setError('Por favor, escriba un titulo para su historia')
             return;
         }
         else if (!principalGenre) {
-            setError('Elija un genero para su comic')
+            setError('Elija un genero para su historia')
             return;
         }
         else if (files.length == 0) {
-            setError('Ponga el contenido de su comic')
+            setError('Ponga el contenido de su historia')
             return;
         }
 
@@ -61,7 +61,7 @@ export const CreateComic = () => {
     const register = (form) => {
 
         const token = store.token || sessionStorage.getItem("token")
-        const resp = fetch(import.meta.env.VITE_BACKEND_URL + '/api/newComic', {
+        const resp = fetch(import.meta.env.VITE_BACKEND_URL + '/api/newHistory', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token },
             body: form
@@ -82,9 +82,9 @@ export const CreateComic = () => {
 
     const handleFileChangeComic = (e) => {
         // --For Multiple File Input
-        let images = [];
+        let text = [];
         for (let i = 0; i < e.target.files.length; i++) {
-            images.push((e.target.files[i]));
+            text.push((e.target.files[i]));
             let reader = new FileReader();
             let file = e.target.files[i];
             reader.onloadend = () => {
@@ -103,11 +103,11 @@ export const CreateComic = () => {
                 reader.readAsDataURL(file);
             }
         }
-        setFiles(images)
+        setFiles(text)
     }
 
     const DeleteSelectFile = (id) => {
-        if (window.confirm("Are you sure you want to delete this Image?")) {
+        if (window.confirm("Are you sure you want to delete this File?")) {
             const result = selectedfile.filter((data) => data.id !== id);
             SetSelectedFile(result);
         }
@@ -143,7 +143,7 @@ export const CreateComic = () => {
 
         <form onSubmit={handleSubmit}>
             <div className="container py-5 text-align-center" style={{ maxWidth: '700px', color: '#e0e0ff' }}>
-                <h2 className="mb-4">Detalles de nuevo comic</h2>
+                <h2 className="mb-4">Detalles de su nueva historia</h2>
                 {error && <div className="alert alert-danger py-2">{error}</div>}
                 <div className="container d-flex">
 
@@ -203,12 +203,12 @@ export const CreateComic = () => {
                                     <div className="kb-data-box">
                                         <div className="kb-modal-data-title">
                                             <div className="kb-data-title">
-                                                <h6>Imagenes del comic</h6>
+                                                <h6>Archivos de la Historia</h6>
                                             </div>
                                         </div>
                                         <div className="kb-file-upload">
                                             <div className="file-upload-box">
-                                                <input type="file" id="fileupload" className="file-upload-input" onChange={handleFileChangeComic} multiple accept='.jpg,.jpeg,.png,.webp' />
+                                                <input type="file" id="fileupload" className="file-upload-input" onChange={handleFileChangeComic} accept='.txt,.md,.json,.docx,.odt,.rtf,.pdf,.epub' />
                                                 <span>Arrastrar y soltar o <span className="file-link">elija sus archivos</span></span>
                                             </div>
                                         </div>

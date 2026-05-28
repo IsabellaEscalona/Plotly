@@ -242,3 +242,82 @@ def search_books():
         })
     
     return jsonify(books), 200
+    
+
+@api.route('/newHistory', methods=['POST'])
+@jwt_required()
+def newHistory():
+    body = request.form
+    print(request.files)
+    user_id = get_jwt_identity()
+    if not body.get('title'):
+        return jsonify({'status': 'error', 'message': 'El titulo es obligatorio'}), 400
+    if not body.get('principal_genre'):
+        return jsonify({'status': 'error', 'message': 'El genero principal es obligatorio'}), 400
+    if not 'content[]' in request.files:
+        return jsonify({'status': 'error', 'message': 'Los archivos son obligatorios'}), 400
+
+    title = body['title']
+    category = Enum_Category_Post.ONLY_TEXT
+
+    primer_tipo_recibido = body['principal_genre']
+
+    if primer_tipo_recibido == 'Accion':
+        principal_genre = Enum_Genre_post.ACCION
+    if primer_tipo_recibido == 'Romance':
+        principal_genre = Enum_Genre_post.ROMANCE
+    if primer_tipo_recibido == 'Terror':
+        principal_genre = Enum_Genre_post.TERROR
+    if primer_tipo_recibido == 'Fantasia':
+        principal_genre = Enum_Genre_post.FANTASIA
+    if primer_tipo_recibido == 'Sci-Fi':
+        principal_genre = Enum_Genre_post.SCIFI
+
+    segundo_tipo_recibido = body['secondary_genre']
+
+    if segundo_tipo_recibido == 'Accion':
+        secondary_genre = Enum_Genre_post.ACCION
+    if segundo_tipo_recibido == 'Romance':
+        secondary_genre = Enum_Genre_post.ROMANCE
+    if segundo_tipo_recibido == 'Terror':
+        secondary_genre = Enum_Genre_post.TERROR
+    if segundo_tipo_recibido == 'Fantasia':
+        secondary_genre = Enum_Genre_post.FANTASIA
+    if segundo_tipo_recibido == 'Sci-Fi':
+        secondary_genre = Enum_Genre_post.SCIFI
+
+    description = body['description']
+    cover = request.files['cover']
+
+    result = cloudinary.uploader.upload(cover, folder='covers')
+
+    if result:
+
+        new_Post= Post(user_id=user_id, title=title, category=category, principal_genre=principal_genre, 
+                       secondary_genre=secondary_genre, description=description, cover=result['secure_url'])
+        
+        db.session.add(new_Post)
+        db.session.flush()
+        
+        files = request.files.getlist('content[]')
+        print(files)
+        result_files=''
+
+        for file in files:
+            try:
+                response=cloudinary.uploader.upload(file, folder='files')
+                print(response['secure_url'])
+                result_files=response['secure_url']
+                new_content_post= Content_Post(post_id=new_Post.id, url=result_files)
+                db.session.add(new_content_post)
+                db.session.flush()
+
+            except Exception as e:
+                return jsonify({'message':'Hubo un error al subir el contenido del historia'}), 400
+            
+        db.session.commit()
+
+        return jsonify({'message':'Post creado exito'}), 200
+    
+    else:
+        return jsonify({'message':'Post no creado'}), 500
