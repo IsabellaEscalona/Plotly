@@ -22,7 +22,7 @@ export const Signup = () => {
             return
         }
         if (!tipo) {
-            setError("Seleccioná un tipo de cuenta.")
+            setError("Selecciona un tipo de cuenta.")
             return
         }
         const resp = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/signup", {
@@ -53,7 +53,7 @@ export const Signup = () => {
                 <div className="text-center mb-4">
                     <span style={{ fontSize: "2rem", color: "rgb(255, 255, 255)" }}><i class="fa-solid fa-cubes"></i></span>
                     <h4 className="text-white fw-bold mt-1">Plotly</h4>
-                    <p className="text-secondary mb-0">Creá tu cuenta</p>
+                    <p className="text-secondary mb-0">Crea tu cuenta</p>
                 </div>
                 {error && <div className="alert alert-danger py-2">{error}</div>}
                 <div className="mb-3">
@@ -149,7 +149,7 @@ export const Signup = () => {
                 </button>
                 <p className="text-center text-secondary mt-3 mb-0" style={{ fontSize: "0.9rem" }}>
                     ¿Tienes cuenta?{" "}
-                    <Link to="/login" >Iniciá sesión</Link>
+                    <Link to="/login" >Inicia sesión</Link>
                 </p>
             </div>
         </div>
