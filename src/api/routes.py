@@ -217,3 +217,28 @@ def newComic():
     
     else:
         return jsonify({'message':'Post no creado'}), 500
+
+
+
+
+import requests
+
+@api.route('/search-books', methods=['GET'])
+def search_books():
+    query = request.args.get('q')
+    if not query:
+        return jsonify({"error": "Se requiere un término de búsqueda"}), 400
+    
+    response = requests.get(f"https://openlibrary.org/search.json?q={query}&limit=10")
+    data = response.json()
+    
+    books = []
+    for book in data.get("docs", []):
+        books.append({
+            "title": book.get("title"),
+            "author": book.get("author_name", ["Desconocido"])[0],
+            "year": book.get("first_publish_year"),
+            "cover": f"https://covers.openlibrary.org/b/id/{book.get('cover_i')}-M.jpg" if book.get("cover_i") else None
+        })
+    
+    return jsonify(books), 200
