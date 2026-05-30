@@ -1,10 +1,11 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
+import requests
 from flask import Flask, request, jsonify, url_for, Blueprint
 import cloudinary
 import cloudinary.uploader
-from api.models import db, User, Profile, Enum_Artist, TIPO_MAP, Post, Enum_Genre_post, Enum_Category_Post, Content_Post, Saved
+from api.models import db, User, Profile, Enum_Artist, TIPO_MAP, Post, Enum_Genre_post, Enum_Category_Post, Content_Post, Saved, Comment
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -189,49 +190,47 @@ def newComic():
 
     if result:
 
-        new_Post= Post(user_id=user_id, title=title, category=category, principal_genre=principal_genre, 
-                       secondary_genre=secondary_genre, description=description, cover=result['secure_url'])
-        
+        new_Post = Post(user_id=user_id, title=title, category=category, principal_genre=principal_genre,
+                        secondary_genre=secondary_genre, description=description, cover=result['secure_url'])
+
         db.session.add(new_Post)
         db.session.flush()
-        
+
         files = request.files.getlist('content[]')
         print(files)
-        result_files=''
+        result_files = ''
 
         for file in files:
             try:
-                response=cloudinary.uploader.upload(file, folder='files')
+                response = cloudinary.uploader.upload(file, folder='files')
                 print(response['secure_url'])
-                result_files=response['secure_url']
-                new_content_post= Content_Post(post_id=new_Post.id, url=result_files)
+                result_files = response['secure_url']
+                new_content_post = Content_Post(
+                    post_id=new_Post.id, url=result_files)
                 db.session.add(new_content_post)
                 db.session.flush()
 
             except Exception as e:
-                return jsonify({'message':'Hubo un error al subir el contenido del comic'}), 400
-            
+                return jsonify({'message': 'Hubo un error al subir el contenido del comic'}), 400
+
         db.session.commit()
 
-        return jsonify({'message':'Post creado exito'}), 200
-    
+        return jsonify({'message': 'Post creado exito'}), 200
+
     else:
-        return jsonify({'message':'Post no creado'}), 500
+        return jsonify({'message': 'Post no creado'}), 500
 
-
-
-
-import requests
 
 @api.route('/search-books', methods=['GET'])
 def search_books():
     query = request.args.get('q')
     if not query:
         return jsonify({"error": "Se requiere un término de búsqueda"}), 400
-    
-    response = requests.get(f"https://openlibrary.org/search.json?q={query}&limit=10")
+
+    response = requests.get(
+        f"https://openlibrary.org/search.json?q={query}&limit=10")
     data = response.json()
-    
+
     books = []
     for book in data.get("docs", []):
         books.append({
@@ -240,9 +239,9 @@ def search_books():
             "year": book.get("first_publish_year"),
             "cover": f"https://covers.openlibrary.org/b/id/{book.get('cover_i')}-M.jpg" if book.get("cover_i") else None
         })
-    
+
     return jsonify(books), 200
-    
+
 
 @api.route('/newHistory', methods=['POST'])
 @jwt_required()
@@ -293,34 +292,36 @@ def newHistory():
 
     if result:
 
-        new_Post= Post(user_id=user_id, title=title, category=category, principal_genre=principal_genre, 
-                       secondary_genre=secondary_genre, description=description, cover=result['secure_url'])
-        
+        new_Post = Post(user_id=user_id, title=title, category=category, principal_genre=principal_genre,
+                        secondary_genre=secondary_genre, description=description, cover=result['secure_url'])
+
         db.session.add(new_Post)
         db.session.flush()
-        
+
         files = request.files.getlist('content[]')
         print(files)
-        result_files=''
+        result_files = ''
 
         for file in files:
             try:
-                response=cloudinary.uploader.upload(file, folder='files')
+                response = cloudinary.uploader.upload(file, folder='files')
                 print(response['secure_url'])
-                result_files=response['secure_url']
-                new_content_post= Content_Post(post_id=new_Post.id, url=result_files)
+                result_files = response['secure_url']
+                new_content_post = Content_Post(
+                    post_id=new_Post.id, url=result_files)
                 db.session.add(new_content_post)
                 db.session.flush()
 
             except Exception as e:
-                return jsonify({'message':'Hubo un error al subir el contenido del historia'}), 400
-            
+                return jsonify({'message': 'Hubo un error al subir el contenido del historia'}), 400
+
         db.session.commit()
 
-        return jsonify({'message':'Post creado exito'}), 200
-    
+        return jsonify({'message': 'Post creado exito'}), 200
+
     else:
-        return jsonify({'message':'Post no creado'}), 500
+        return jsonify({'message': 'Post no creado'}), 500
+
 
 @api.route('/comic/<int:post_id>', methods=['GET'])
 @jwt_required(optional=True)
@@ -332,13 +333,24 @@ def get_comic(post_id):
     user_id = get_jwt_identity()
     guardado = False
     if user_id:
-        guardado = Saved.query.filter_by(user_id=user_id, post_id=post_id).first() is not None
+        guardado = Saved.query.filter_by(
+            user_id=user_id, post_id=post_id).first() is not None
+    comentarios = []
+    for c in post.comment:
+        autor = User.query.get(c.user_id)
+        comentarios.append({
+            'id': c.id,
+            'usuario': autor.username if autor else 'desconocido',
+            'texto': c.content
+        })
     return jsonify({
         **post.serialize(),
         'autor': post.author.username,
         'paginas': paginas,
-        'guardado': guardado
+        'guardado': guardado,
+        'comentarios': comentarios
     }), 200
+
 
 @api.route('/save/<int:post_id>', methods=['POST'])
 @jwt_required()
@@ -347,7 +359,8 @@ def save_comic(post_id):
     post = Post.query.get(post_id)
     if not post:
         return jsonify({'error': 'Comic no encontrado'}), 404
-    ya_guardado = Saved.query.filter_by(user_id=user_id, post_id=post_id).first()
+    ya_guardado = Saved.query.filter_by(
+        user_id=user_id, post_id=post_id).first()
     if ya_guardado:
         return jsonify({'message': 'Ya estaba guardado'}), 200
     nuevo_guardado = Saved(user_id=user_id, post_id=post_id)
@@ -367,6 +380,7 @@ def unsave_comic(post_id):
     db.session.commit()
     return jsonify({'message': 'Comic quitado de guardados'}), 200
 
+
 @api.route('/library', methods=['GET'])
 @jwt_required()
 def get_library():
@@ -380,3 +394,18 @@ def get_library():
             'autor': post.author.username
         })
     return jsonify(comics), 200
+
+@api.route('/comic/<int:post_id>/comment', methods=['POST'])
+@jwt_required()
+def add_comment(post_id):
+    user_id = get_jwt_identity()
+    body = request.json
+    if not body.get('content'):
+        return jsonify({'error': 'El comentario no puede estar vacio'}), 400
+    post = Post.query.get(post_id)
+    if not post:
+        return jsonify({'error': 'Comic no encontrado'}), 404
+    nuevo = Comment(user_id=user_id, post_id=post_id, content=body['content'])
+    db.session.add(nuevo)
+    db.session.commit()
+    return jsonify({'message': 'Comentario agregado'}), 201

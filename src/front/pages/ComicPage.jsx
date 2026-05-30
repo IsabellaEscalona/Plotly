@@ -2,12 +2,6 @@ import { useState, useEffect } from "react"
 import { Link, useParams, useNavigate } from "react-router-dom"
 import placeholderImage from "../assets/img/placeholder.jpg"
 
-const COMENTARIOS = [
-    { id: 1, usuario: "juanceto01", texto: "Y esos auris de virgo momo?", fecha: "hace 2 días" },
-    { id: 2, usuario: "elrubioONG", texto: "aaaaaaaaaaaaaaaaaaaaaaaaa", fecha: "hace 5 días" },
-    { id: 3, usuario: "goku234", texto: "holasoygoku", fecha: "hace 1 semana" },
-]
-
 export const ComicPage = () => {
     const { id } = useParams()
     const navigate = useNavigate()
@@ -15,7 +9,7 @@ export const ComicPage = () => {
     const [guardado, setGuardado] = useState(false)
     const [comentario, setComentario] = useState("")
 
-    useEffect(() => {
+    const cargarComic = () => {
         const token = sessionStorage.getItem('token')
         fetch(import.meta.env.VITE_BACKEND_URL + `/api/comic/${id}`, {
             headers: token ? { 'Authorization': 'Bearer ' + token } : {}
@@ -25,7 +19,34 @@ export const ComicPage = () => {
                 setObra(data)
                 setGuardado(data.guardado)
             })
+    }
+
+    useEffect(() => {
+        cargarComic()
     }, [id])
+
+    const handleComentar = () => {
+        const token = sessionStorage.getItem('token')
+        if (!token) {
+            navigate('/login')
+            return
+        }
+        if (!comentario.trim()) return
+        fetch(import.meta.env.VITE_BACKEND_URL + `/api/comic/${id}/comment`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ content: comentario })
+        })
+            .then(r => {
+                if (r.ok) {
+                    setComentario("")
+                    cargarComic()
+                }
+            })
+    }
     const handleGuardar = () => {
         const token = sessionStorage.getItem('token')
         if (!token) {
@@ -104,27 +125,28 @@ export const ComicPage = () => {
                         placeholder="Escribe un comentario..."
                         value={comentario}
                         onChange={e => setComentario(e.target.value)}
-                        style={{ backgroundColor: "#2a2a45", border: "1px solid #3a3a55", color: "#e0e0ff" }}
+                        style={{ backgroundColor: "#ffffff", border: "1px solid #3a3a55", color: "#e0e0ff" }}
                     />
-                    <button className="btn px-3 fw-bold" style={{ backgroundColor: "#c8b8ff", color: "#12121f", whiteSpace: "nowrap" }}>
+                    <button className="btn px-3 fw-bold" onClick={handleComentar} style={{ backgroundColor: "#c8b8ff", color: "#12121f", whiteSpace: "nowrap" }}>
                         Enviar
                     </button>
                 </div>
                 <div className="d-flex flex-column gap-4">
-                    {COMENTARIOS.map(c => (
+                    {(obra.comentarios || []).map(c => (
                         <div key={c.id} className="d-flex gap-3">
-                            <div style={{
-                                width: "40px", height: "40px", borderRadius: "50%",
-                                backgroundColor: "#2a2a45", flexShrink: 0,
-                                display: "flex", alignItems: "center", justifyContent: "center"
-                            }}>
-                                <i className="fa-solid fa-user" style={{ color: "#c8b8ff" }}></i>
-                            </div>
-                            <div>
-                                <div className="d-flex gap-2 align-items-center mb-1">
-                                    <span className="fw-bold" style={{ color: "#ffffff", fontSize: "0.9rem" }}>{c.usuario}</span>
-                                    <span style={{ color: "#555", fontSize: "0.8rem" }}>{c.fecha}</span>
+                            <Link to={`/profile/${c.usuario}`} style={{ flexShrink: 0 }}>
+                                <div style={{
+                                    width: "40px", height: "40px", borderRadius: "50%",
+                                    backgroundColor: "#2a2a45",
+                                    display: "flex", alignItems: "center", justifyContent: "center"
+                                }}>
+                                    <i className="fa-solid fa-user" style={{ color: "#c8b8ff" }}></i>
                                 </div>
+                            </Link>
+                            <div>
+                                <Link to={`/profile/${c.usuario}`} className="fw-bold mb-1 d-block" style={{ color: "#ffffff", fontSize: "0.9rem", textDecoration: "none" }}>
+                                    {c.usuario}
+                                </Link>
                                 <p className="mb-0" style={{ color: "#b0b0cc", fontSize: "0.95rem" }}>{c.texto}</p>
                             </div>
                         </div>
