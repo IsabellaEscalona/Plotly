@@ -80,7 +80,7 @@ export const Navbar = () => {
                     <li><Link className="dropdown-item" to="/me">Mi Perfil</Link></li>
                     <li><a className="dropdown-item disabled" href="#">Notis</a></li>
                     <li><a className="dropdown-item disabled" href="#">Buzón</a></li>
-                    <li><a className="dropdown-item disabled" href="#">Biblioteca</a></li>
+                    <li><Link className="dropdown-item" to="/biblioteca">Biblioteca</Link></li>
                     <li><Link className="dropdown-item" to="/settings">Configuración</Link></li>
                     <li><hr className="dropdown-divider" /></li>
                     <li><button className="dropdown-item text-danger" onClick={handleLogout}>Cerrar sesión</button></li>

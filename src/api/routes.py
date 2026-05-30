@@ -4,7 +4,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 from flask import Flask, request, jsonify, url_for, Blueprint
 import cloudinary
 import cloudinary.uploader
-from api.models import db, User, Profile, Enum_Artist, TIPO_MAP, Post, Enum_Genre_post, Enum_Category_Post, Content_Post
+from api.models import db, User, Profile, Enum_Artist, TIPO_MAP, Post, Enum_Genre_post, Enum_Category_Post, Content_Post, Saved
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -323,13 +323,60 @@ def newHistory():
         return jsonify({'message':'Post no creado'}), 500
 
 @api.route('/comic/<int:post_id>', methods=['GET'])
+@jwt_required(optional=True)
 def get_comic(post_id):
     post = Post.query.get(post_id)
     if not post:
         return jsonify({'error': 'Comic no encontrado'}), 404
     paginas = [c.url for c in post.content]
+    user_id = get_jwt_identity()
+    guardado = False
+    if user_id:
+        guardado = Saved.query.filter_by(user_id=user_id, post_id=post_id).first() is not None
     return jsonify({
         **post.serialize(),
         'autor': post.author.username,
-        'paginas': paginas
+        'paginas': paginas,
+        'guardado': guardado
     }), 200
+
+@api.route('/save/<int:post_id>', methods=['POST'])
+@jwt_required()
+def save_comic(post_id):
+    user_id = get_jwt_identity()
+    post = Post.query.get(post_id)
+    if not post:
+        return jsonify({'error': 'Comic no encontrado'}), 404
+    ya_guardado = Saved.query.filter_by(user_id=user_id, post_id=post_id).first()
+    if ya_guardado:
+        return jsonify({'message': 'Ya estaba guardado'}), 200
+    nuevo_guardado = Saved(user_id=user_id, post_id=post_id)
+    db.session.add(nuevo_guardado)
+    db.session.commit()
+    return jsonify({'message': 'Comic guardado'}), 201
+
+
+@api.route('/save/<int:post_id>', methods=['DELETE'])
+@jwt_required()
+def unsave_comic(post_id):
+    user_id = get_jwt_identity()
+    guardado = Saved.query.filter_by(user_id=user_id, post_id=post_id).first()
+    if not guardado:
+        return jsonify({'message': 'No estaba guardado'}), 200
+    db.session.delete(guardado)
+    db.session.commit()
+    return jsonify({'message': 'Comic quitado de guardados'}), 200
+
+@api.route('/library', methods=['GET'])
+@jwt_required()
+def get_library():
+    user_id = get_jwt_identity()
+    guardados = Saved.query.filter_by(user_id=user_id).all()
+    comics = []
+    for g in guardados:
+        post = g.post
+        comics.append({
+            **post.serialize(),
+            'autor': post.author.username
+        })
+    return jsonify(comics), 200

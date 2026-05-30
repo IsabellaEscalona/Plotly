@@ -126,6 +126,8 @@ class Post(db.Model):
 
     like = db.relationship('Like', backref='post')
 
+    saved = db.relationship('Saved', backref='post')
+
 
 class Content_Post(db.Model):
     __tablename__ = 'contents_posts'
@@ -148,3 +150,20 @@ class Like(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
     liked = db.Column(db.Boolean, default=False)
+
+class Saved(db.Model):
+    __tablename__ = 'saved'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'post_id', name='uq_user_post_saved'),
+    )
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "post_id": self.post_id
+        }

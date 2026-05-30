@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useParams, useNavigate } from "react-router-dom"
 import placeholderImage from "../assets/img/placeholder.jpg"
 
 const COMENTARIOS = [
@@ -10,16 +10,37 @@ const COMENTARIOS = [
 
 export const ComicPage = () => {
     const { id } = useParams()
+    const navigate = useNavigate()
     const [obra, setObra] = useState(null)
-    const [siguiendo, setSiguiendo] = useState(false)
     const [guardado, setGuardado] = useState(false)
     const [comentario, setComentario] = useState("")
 
     useEffect(() => {
-        fetch(import.meta.env.VITE_BACKEND_URL + `/api/comic/${id}`)
+        const token = sessionStorage.getItem('token')
+        fetch(import.meta.env.VITE_BACKEND_URL + `/api/comic/${id}`, {
+            headers: token ? { 'Authorization': 'Bearer ' + token } : {}
+        })
             .then(r => r.json())
-            .then(data => setObra(data))
+            .then(data => {
+                setObra(data)
+                setGuardado(data.guardado)
+            })
     }, [id])
+    const handleGuardar = () => {
+        const token = sessionStorage.getItem('token')
+        if (!token) {
+            navigate('/login')
+            return
+        }
+
+        fetch(import.meta.env.VITE_BACKEND_URL + `/api/save/${id}`, {
+            method: guardado ? 'DELETE' : 'POST',
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+            .then(r => {
+                if (r.ok) setGuardado(!guardado)
+            })
+    }
 
     if (!obra) return <p className="text-center mt-5" style={{ color: "#e0e0ff" }}>Cargando...</p>
 
@@ -50,20 +71,8 @@ export const ComicPage = () => {
                     <p className="mb-3" style={{ color: "#b0b0cc", fontSize: "0.9rem", maxWidth: "600px" }}>{obra.description}</p>
                     <div className="d-flex gap-2">
                         <button
-                            className="btn fw-bold px-4"
-                            onClick={() => setSiguiendo(!siguiendo)}
-                            style={{
-                                backgroundColor: siguiendo ? "#2a2a45" : "#c8b8ff",
-                                color: siguiendo ? "#c8b8ff" : "#12121f",
-                                border: "none"
-                            }}
-                        >
-                            <i className={`fa-solid ${siguiendo ? "fa-check" : "fa-plus"} me-2`}></i>
-                            {siguiendo ? "Siguiendo" : "Seguir"}
-                        </button>
-                        <button
                             className="btn px-3"
-                            onClick={() => setGuardado(!guardado)}
+                            onClick={handleGuardar}
                             style={{ backgroundColor: "#2a2a45", color: guardado ? "#c8b8ff" : "#888aaa", border: "none" }}
                         >
                             <i className={`fa-${guardado ? "solid" : "regular"} fa-bookmark`}></i>
