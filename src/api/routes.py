@@ -296,3 +296,15 @@ def newHistory():
     
     else:
         return jsonify({'message':'Post no creado'}), 500
+
+@api.route('/comic/<int:post_id>', methods=['GET'])
+def get_comic(post_id):
+    post = Post.query.get(post_id)
+    if not post:
+        return jsonify({'error': 'Comic no encontrado'}), 404
+    paginas = [c.url for c in post.content]
+    return jsonify({
+        **post.serialize(),
+        'autor': post.author.username,
+        'paginas': paginas
+    }), 200

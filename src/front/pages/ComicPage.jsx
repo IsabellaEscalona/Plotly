@@ -1,26 +1,6 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { Link, useParams } from "react-router-dom"
 import placeholderImage from "../assets/img/placeholder.jpg"
-
-const OBRA = {
-    id: 1,
-    titulo: "Titulo de la obra",
-    autor: "pepitogamer06",
-    portada: null,
-    genero_principal: "Fantasía",
-    genero_secundario: "Acción",
-    descripcion: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus, saepe esse! Nesciunt, voluptates quasi! Earum placeat, beatae culpa molestiae temporibus ullam fugit iure perspiciatis rerum possimus voluptatum dolorem ea molestias non, cum hic doloremque!",
-    likes: 110,
-    vistas: 380,
-    seguidores: 4,
-    paginas: [
-        placeholderImage,
-        placeholderImage,
-        placeholderImage,
-        placeholderImage,
-        placeholderImage,
-    ]
-}
 
 const COMENTARIOS = [
     { id: 1, usuario: "juanceto01", texto: "Y esos auris de virgo momo?", fecha: "hace 2 días" },
@@ -29,44 +9,45 @@ const COMENTARIOS = [
 ]
 
 export const ComicPage = () => {
+    const { id } = useParams()
+    const [obra, setObra] = useState(null)
     const [siguiendo, setSiguiendo] = useState(false)
     const [guardado, setGuardado] = useState(false)
     const [comentario, setComentario] = useState("")
+
+    useEffect(() => {
+        fetch(import.meta.env.VITE_BACKEND_URL + `/api/comic/${id}`)
+            .then(r => r.json())
+            .then(data => setObra(data))
+    }, [id])
+
+    if (!obra) return <p className="text-center mt-5" style={{ color: "#e0e0ff" }}>Cargando...</p>
 
     return (
         <div style={{ color: "#ffffff" }}>
             <div className="d-flex gap-4 px-4 py-4 flex-wrap" style={{ backgroundColor: "#1e1e2e" }}>
                 <img
-                    src={OBRA.portada || placeholderImage}
-                    alt={OBRA.titulo}
+                    src={obra.cover || placeholderImage}
+                    alt={obra.title}
                     style={{ width: "130px", height: "190px", objectFit: "cover", borderRadius: "10px", flexShrink: 0 }}
                 />
-
                 <div className="flex-grow-1">
-                    <h3 className="fw-bold mb-1">{OBRA.titulo}</h3>
+                    <h3 className="fw-bold mb-1">{obra.title}</h3>
                     <p className="mb-2">
                         <i className="fa-solid fa-user me-2"></i>
-                        {/* hay que remplazar el "/me" por la id del usuario, ya que en realidad este link es para el perfil porpio y no ajeno */}
-                        <Link to="/me" style={{ color: "#ffffff", textDecoration: "none" }}>{OBRA.autor}</Link>
+                        <Link to="/me" style={{ color: "#ffffff", textDecoration: "none" }}>{obra.autor}</Link>
                     </p>
-
                     <div className="d-flex gap-2 mb-2">
                         <span className="badge rounded-pill px-3 py-2" style={{ backgroundColor: "#2a2a45", color: "#c8b8ff" }}>
-                            {OBRA.genero_principal}
+                            {obra.principal_genre}
                         </span>
-                        {OBRA.genero_secundario && (
+                        {obra.secondary_genre && (
                             <span className="badge rounded-pill px-3 py-2" style={{ backgroundColor: "#2a2a45", color: "#c8b8ff" }}>
-                                {OBRA.genero_secundario}
+                                {obra.secondary_genre}
                             </span>
                         )}
                     </div>
-
-                    <p className="mb-3" style={{ color: "#b0b0cc", fontSize: "0.9rem", maxWidth: "600px" }}>{OBRA.descripcion}</p>
-                    <div className="d-flex gap-4 mb-3" style={{ color: "#888aaa" }}>
-                        <span><i className="fa-solid fa-eye me-1"></i>{OBRA.vistas.toLocaleString()}</span>
-                        <span><i className="fa-solid fa-heart me-1"></i>{OBRA.likes.toLocaleString()}</span>
-                        <span><i className="fa-solid fa-bookmark me-1"></i>{OBRA.seguidores.toLocaleString()}</span>
-                    </div>
+                    <p className="mb-3" style={{ color: "#b0b0cc", fontSize: "0.9rem", maxWidth: "600px" }}>{obra.description}</p>
                     <div className="d-flex gap-2">
                         <button
                             className="btn fw-bold px-4"
@@ -90,26 +71,20 @@ export const ComicPage = () => {
                     </div>
                 </div>
             </div>
+
             <div style={{ backgroundColor: "#000000", paddingTop: "32px", paddingBottom: "30px" }}>
                 <div className="d-flex flex-column align-items-center" style={{ gap: "12px" }}>
-                    {OBRA.paginas.map((pagina, index) => (
+                    {(obra.paginas || []).map((pagina, index) => (
                         <img
                             key={index}
                             src={pagina}
                             alt={`Página ${index + 1}`}
-                            style={{
-                                width: "100%",
-                                maxWidth: "450px",
-                                aspectRatio: "2 / 3",
-                                objectFit: "cover",
-                                display: "block"
-                            }}
+                            style={{ width: "100%", maxWidth: "600px", height: "auto", display: "block" }}
                         />
                     ))}
                 </div>
             </div>
-            {/* los comentarios (al igual que todos los elementos) no funcionan, está todo 
-            hardcodeado, cuando el post de comics quede realizado ya haremos esta page funcional */}
+
             <div className="px-4 py-5" style={{ backgroundColor: "#1e1e2e" }}>
                 <h5 className="fw-bold mb-4">
                     <i className="fa-solid fa-comments me-2"></i>Comentarios
@@ -120,12 +95,9 @@ export const ComicPage = () => {
                         placeholder="Escribe un comentario..."
                         value={comentario}
                         onChange={e => setComentario(e.target.value)}
-                        style={{ backgroundColor: "#ffffff", border: "1px solid #3a3a55", color: "#e0e0ff" }}
+                        style={{ backgroundColor: "#2a2a45", border: "1px solid #3a3a55", color: "#e0e0ff" }}
                     />
-                    <button
-                        className="btn px-3 fw-bold"
-                        style={{ backgroundColor: "#ffffff", color: "#12121f", whiteSpace: "nowrap" }}
-                    >
+                    <button className="btn px-3 fw-bold" style={{ backgroundColor: "#c8b8ff", color: "#12121f", whiteSpace: "nowrap" }}>
                         Enviar
                     </button>
                 </div>

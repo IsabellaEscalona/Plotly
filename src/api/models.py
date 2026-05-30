@@ -112,11 +112,11 @@ class Post(db.Model):
             "id": self.id,
             "user_id": self.user_id,
             'title': self.title,
-            'category':self.category,
-            'principal_genre':self.principal_genre,
-            'secondary_genre':self.secondary_genre,
-            'description':self.description,
-            'cover':self.cover
+            'category': self.category.value if self.category else None,
+            'principal_genre': self.principal_genre.value if self.principal_genre else None,
+            'secondary_genre': self.secondary_genre.value if self.secondary_genre else None,
+            'description': self.description,
+            'cover': self.cover
             # do not serialize the password, its a security breach
         }
 
