@@ -77,7 +77,7 @@ export const ComicPage = () => {
                     <h3 className="fw-bold mb-1">{obra.title}</h3>
                     <p className="mb-2">
                         <i className="fa-solid fa-user me-2"></i>
-                        <Link to="/me" style={{ color: "#ffffff", textDecoration: "none" }}>{obra.autor}</Link>
+                        <Link to={`/profile/${obra.autor}`} style={{ color: "#ffffff", textDecoration: "none" }}>{obra.autor}</Link>
                     </p>
                     <div className="d-flex gap-2 mb-2">
                         <span className="badge rounded-pill px-3 py-2" style={{ backgroundColor: "#2a2a45", color: "#c8b8ff" }}>
@@ -125,7 +125,7 @@ export const ComicPage = () => {
                         placeholder="Escribe un comentario..."
                         value={comentario}
                         onChange={e => setComentario(e.target.value)}
-                        style={{ backgroundColor: "#ffffff", border: "1px solid #3a3a55", color: "#e0e0ff" }}
+                        style={{ backgroundColor: "#ffffff", border: "1px solid #3a3a55", color: "#2c2c2c" }}
                     />
                     <button className="btn px-3 fw-bold" onClick={handleComentar} style={{ backgroundColor: "#c8b8ff", color: "#12121f", whiteSpace: "nowrap" }}>
                         Enviar

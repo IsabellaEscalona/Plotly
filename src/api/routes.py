@@ -395,6 +395,7 @@ def get_library():
         })
     return jsonify(comics), 200
 
+
 @api.route('/comic/<int:post_id>/comment', methods=['POST'])
 @jwt_required()
 def add_comment(post_id):
@@ -409,3 +410,34 @@ def add_comment(post_id):
     db.session.add(nuevo)
     db.session.commit()
     return jsonify({'message': 'Comentario agregado'}), 201
+
+
+@api.route('/profile/<username>', methods=['GET'])
+def get_profile(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    posts = []
+    for p in user.Post:
+        posts.append({
+            **p.serialize(),
+            'autor': user.username,
+            'guardados': len(p.saved)
+        })
+    posts.sort(key=lambda x: x['guardados'], reverse=True)
+    data = user.perfil.serialize() if user.perfil else {}
+    data['username'] = user.username
+    data['posts'] = posts
+    return jsonify(data), 200
+
+@api.route('/feed', methods=['GET'])
+def get_feed():
+    posts = Post.query.order_by(Post.id.desc()).all()
+    comics = []
+    for p in posts:
+        comics.append({
+            **p.serialize(),
+            'autor': p.author.username,
+            'guardados': len(p.saved)
+        })
+    return jsonify(comics), 200
