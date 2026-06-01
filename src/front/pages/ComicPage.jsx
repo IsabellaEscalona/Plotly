@@ -114,10 +114,9 @@ export const ComicPage = () => {
                     ))}
                 </div>
             </div>
-
             <div className="px-4 py-5" style={{ backgroundColor: "#1e1e2e" }}>
                 <h5 className="fw-bold mb-4">
-                    <i className="fa-solid fa-comments me-2"></i>Comentarios
+                    <i className="fa-solid fa-comments me-2"></i>Comentarios ({(obra.comentarios || []).length})
                 </h5>
                 <div className="d-flex gap-2 mb-5">
                     <input
@@ -132,7 +131,7 @@ export const ComicPage = () => {
                     </button>
                 </div>
                 <div className="d-flex flex-column gap-4">
-                    {(obra.comentarios || []).map(c => (
+                    {[...(obra.comentarios || [])].sort((a, b) => b.id - a.id).map(c => (
                         <div key={c.id} className="d-flex gap-3">
                             <Link to={`/profile/${c.usuario}`} style={{ flexShrink: 0 }}>
                                 <div style={{

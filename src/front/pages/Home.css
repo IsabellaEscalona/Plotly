@@ -5,7 +5,8 @@
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.2s, border-color 0.2s;
-    max-width: 160px;
+    width: 160px;
+    flex: 0 0 160px;
 }
 
 .obra-card:hover {
@@ -18,4 +19,17 @@
     aspect-ratio: 2/3;
     object-fit: cover;
     display: block;
+}
+
+.obra-scroll {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;       
+    -ms-overflow-style: none;   
+}
+
+.obra-scroll::-webkit-scrollbar {
+    display: none;            
 }

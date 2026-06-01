@@ -54,6 +54,9 @@ export const CategoriaPage = () => {
                                     <p className="mb-0" style={{ color: "#c8b8ff", fontSize: "0.8rem" }}>
                                         <i className="fa-solid fa-bookmark me-1"></i>{obra.guardados}
                                     </p>
+                                    <p className="mb-0" style={{ color: "#888aaa", fontSize: "0.8rem" }}>
+                                        <i className="fa-regular fa-comment me-1"></i>{obra.comentarios}
+                                    </p>
                                 </div>
                             </div>
                         </Link>

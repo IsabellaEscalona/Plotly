@@ -15,6 +15,14 @@ bcrypt = Bcrypt()
 # Allow CORS requests to this API
 CORS(api)
 
+GENRE_MAP = {
+    'Accion': Enum_Genre_post.ACCION,
+    'Romance': Enum_Genre_post.ROMANCE,
+    'Terror': Enum_Genre_post.TERROR,
+    'Fantasia': Enum_Genre_post.FANTASIA,
+    'Sci-Fi': Enum_Genre_post.SCIFI,
+}
+
 
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
@@ -157,31 +165,8 @@ def newComic():
     title = body['title']
     category = Enum_Category_Post.COMIC
 
-    primer_tipo_recibido = body['principal_genre']
-
-    if primer_tipo_recibido == 'Accion':
-        principal_genre = Enum_Genre_post.ACCION
-    if primer_tipo_recibido == 'Romance':
-        principal_genre = Enum_Genre_post.ROMANCE
-    if primer_tipo_recibido == 'Terror':
-        principal_genre = Enum_Genre_post.TERROR
-    if primer_tipo_recibido == 'Fantasia':
-        principal_genre = Enum_Genre_post.FANTASIA
-    if primer_tipo_recibido == 'Sci-Fi':
-        principal_genre = Enum_Genre_post.SCIFI
-
-    segundo_tipo_recibido = body['secondary_genre']
-
-    if segundo_tipo_recibido == 'Accion':
-        secondary_genre = Enum_Genre_post.ACCION
-    if segundo_tipo_recibido == 'Romance':
-        secondary_genre = Enum_Genre_post.ROMANCE
-    if segundo_tipo_recibido == 'Terror':
-        secondary_genre = Enum_Genre_post.TERROR
-    if segundo_tipo_recibido == 'Fantasia':
-        secondary_genre = Enum_Genre_post.FANTASIA
-    if segundo_tipo_recibido == 'Sci-Fi':
-        secondary_genre = Enum_Genre_post.SCIFI
+    principal_genre = GENRE_MAP.get(body['principal_genre'])
+    secondary_genre = GENRE_MAP.get(body.get('secondary_genre'))
 
     description = body['description']
     cover = request.files['cover']
@@ -430,6 +415,7 @@ def get_profile(username):
     data['posts'] = posts
     return jsonify(data), 200
 
+
 @api.route('/feed', methods=['GET'])
 def get_feed():
     posts = Post.query.order_by(Post.id.desc()).all()
@@ -438,6 +424,7 @@ def get_feed():
         comics.append({
             **p.serialize(),
             'autor': p.author.username,
-            'guardados': len(p.saved)
+            'guardados': len(p.saved),
+            'comentarios': len(p.comment)
         })
     return jsonify(comics), 200

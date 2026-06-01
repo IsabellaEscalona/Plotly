@@ -57,7 +57,7 @@ export const CreateComic = () => {
 
         register(formData)
     }
-
+/* CUANDO CREAS, TE MANTENES EN /newComic
     const register = (form) => {
 
         const token = store.token || localStorage.getItem("token")
@@ -69,6 +69,25 @@ export const CreateComic = () => {
             .then((Response) => Response.json())
 
             .then((data) => console.log(data))
+    }
+*/
+    const register = async (form) => {
+        const token = store.token || localStorage.getItem("token")
+        try {
+            const resp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/newComic', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token },
+                body: form
+            })
+            const data = await resp.json()
+            if (resp.ok) {
+                navigate('/')
+            } else {
+                setError(data.message || 'Hubo un error al crear el cómic')
+            }
+        } catch (err) {
+            setError('No se pudo conectar con el servidor')
+        }
     }
 
     const handleFileChangeCover = (e) => {
