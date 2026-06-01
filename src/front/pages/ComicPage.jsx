@@ -10,7 +10,7 @@ export const ComicPage = () => {
     const [comentario, setComentario] = useState("")
 
     const cargarComic = () => {
-        const token = sessionStorage.getItem('token')
+        const token = localStorage.getItem('token')
         fetch(import.meta.env.VITE_BACKEND_URL + `/api/comic/${id}`, {
             headers: token ? { 'Authorization': 'Bearer ' + token } : {}
         })
@@ -26,7 +26,7 @@ export const ComicPage = () => {
     }, [id])
 
     const handleComentar = () => {
-        const token = sessionStorage.getItem('token')
+        const token = localStorage.getItem('token')
         if (!token) {
             navigate('/login')
             return
@@ -48,7 +48,7 @@ export const ComicPage = () => {
             })
     }
     const handleGuardar = () => {
-        const token = sessionStorage.getItem('token')
+        const token = localStorage.getItem('token')
         if (!token) {
             navigate('/login')
             return

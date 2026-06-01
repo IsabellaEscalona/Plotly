@@ -8,7 +8,7 @@ export const Navbar = () => {
 
     const handleLogout = () => {
         dispatch({ type: "logout" });
-        sessionStorage.clear();
+        localStorage.clear();
         navigate("/login");
     };
 
@@ -45,7 +45,7 @@ export const Navbar = () => {
 
 
             <div className="mx-auto position-relative">
-                <input className="form-control" type="search" placeholder="Buscar libros..."
+                <input className="form-control" type="search" placeholder="Buscar obras..."
                     value={query} onChange={handleSearch}
                     onBlur={() => setTimeout(() => setShowResults(false), 200)}
                     onFocus={() => setShowResults(true)}

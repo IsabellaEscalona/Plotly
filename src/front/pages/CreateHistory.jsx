@@ -60,7 +60,7 @@ export const CreateHistory = () => {
 
     const register = (form) => {
 
-        const token = store.token || sessionStorage.getItem("token")
+        const token = store.token || localStorage.getItem("token")
         const resp = fetch(import.meta.env.VITE_BACKEND_URL + '/api/newHistory', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token },
@@ -131,7 +131,7 @@ export const CreateHistory = () => {
     }, [preview])
 
     useEffect(() => {
-        const token = store.token || sessionStorage.getItem('token')
+        const token = store.token || localStorage.getItem('token')
 
         if (!token) navigate('/login')
 

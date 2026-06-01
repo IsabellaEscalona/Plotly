@@ -23,10 +23,10 @@ export function StoreProvider({ children }) {
 
 
     const checkCurrentUser = () => {
-        if (sessionStorage.getItem('token')) {
-            dispatch({ type: "set_token", payload: (sessionStorage.getItem('token')) })
-            dispatch({ type: "set_user", payload: JSON.parse(sessionStorage.getItem('user')) })
-            dispatch({ type: "set_profile", payload: JSON.parse(sessionStorage.getItem('profile')) })
+        if (localStorage.getItem('token')) {
+            dispatch({ type: "set_token", payload: (localStorage.getItem('token')) })
+            dispatch({ type: "set_user", payload: JSON.parse(localStorage.getItem('user')) })
+            dispatch({ type: "set_profile", payload: JSON.parse(localStorage.getItem('profile')) })
         }
 
     }
@@ -45,8 +45,8 @@ export function StoreProvider({ children }) {
 
         if (resp.status == 401) {
 
-            sessionStorage.removeItem('token')
-            sessionStorage.removeItem('user')
+            localStorage.removeItem('token')
+            localStorage.removeItem('user')
 
         }
 

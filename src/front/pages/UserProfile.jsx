@@ -18,7 +18,7 @@ export const UserProfile = () => {
     }, [username])
 
     useEffect(() => {
-        const token = sessionStorage.getItem('token')
+        const token = localStorage.getItem('token')
         if (!token) return
         fetch(import.meta.env.VITE_BACKEND_URL + '/api/me', {
             headers: { 'Authorization': 'Bearer ' + token }

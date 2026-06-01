@@ -19,9 +19,9 @@ export const Login = () => {
         const data = await resp.json()
 
         if (resp.ok) {
-            sessionStorage.setItem("token", data.token)
-            sessionStorage.setItem("user", JSON.stringify(data.user))
-            sessionStorage.setItem("profile", JSON.stringify(data.profile))
+            localStorage.setItem("token", data.token)
+            localStorage.setItem("user", JSON.stringify(data.user))
+            localStorage.setItem("profile", JSON.stringify(data.profile))
             dispatch({ type: "set_token", payload: data.token })
             dispatch({ type: "set_user", payload: data.user })
             dispatch({ type: "set_profile", payload: data.profile })

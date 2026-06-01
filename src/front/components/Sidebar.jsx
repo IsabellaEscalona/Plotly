@@ -20,11 +20,15 @@ export const Sidebar = () => {
                     <i className="fa-solid fa-compass"></i>
                     <span>Explorar</span>
                 </span>
-
-                <span className="sidebar-link disabled-link">
+                <NavLink
+                    to="/MejoresObras"
+                    className={({ isActive }) =>
+                        "sidebar-link" + (isActive ? " active" : "")
+                    }
+                >
                     <i className="fa-solid fa-star"></i>
                     <span>Mejores Obras</span>
-                </span>
+                </NavLink>
             </nav>
         </aside>
     );

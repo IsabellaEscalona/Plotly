@@ -11,7 +11,7 @@ export const Settings = () => {
     const [error, setError] = useState('')
 
     useEffect(() => {
-        const token = store.token || sessionStorage.getItem("token")
+        const token = store.token || localStorage.getItem("token")
         if (!token) {
             navigate('/login')
             return
@@ -27,7 +27,7 @@ export const Settings = () => {
     }, [store.token])
     const handleSave = async () => {
         setMensaje(''); setError('')
-        const token = store.token || sessionStorage.getItem("token")
+        const token = store.token || localStorage.getItem("token")
         if (!token) { setError("No hay sesión activa"); return }
         if (pass.actual || pass.nueva || pass.confirmar) {
             if (!pass.actual || !pass.nueva || !pass.confirmar) {

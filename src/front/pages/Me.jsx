@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 export const Me = () => {
     const navigate = useNavigate()
     useEffect(() => {
-        const token = sessionStorage.getItem('token')
+        const token = localStorage.getItem('token')
         if (!token) { navigate('/login'); return }
         fetch(import.meta.env.VITE_BACKEND_URL + '/api/me', {
             headers: { 'Authorization': 'Bearer ' + token }

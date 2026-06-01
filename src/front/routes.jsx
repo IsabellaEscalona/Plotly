@@ -19,6 +19,7 @@ import { ComicPage } from "./pages/ComicPage"
 import { CreateHistory } from "./pages/CreateHistory";
 import { Biblioteca } from "./pages/Biblioteca";
 import { UserProfile } from "./pages/UserProfile";
+import { MejoresObras } from "./pages/MejoresObras";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -43,6 +44,7 @@ export const router = createBrowserRouter(
         <Route path="/newComic" element={<CreateComic />}/>
         <Route path="/newHistory" element={<CreateHistory />}/>
         <Route path="/biblioteca" element={<Biblioteca />} />
+        <Route path="/MejoresObras" element={<MejoresObras />} />
         <Route path="/comic/:id" element={<ComicPage />} />
         <Route path="/reset-password" element={<ResetPassword />} />
       </Route>
