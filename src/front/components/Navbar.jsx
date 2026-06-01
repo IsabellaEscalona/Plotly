@@ -35,14 +35,13 @@ export const Navbar = () => {
                     Categorías
                 </button>
                 <ul className="dropdown-menu">
-                    <li><a className="dropdown-item">Acción</a></li>
-                    <li><a className="dropdown-item">Romance</a></li>
-                    <li><a className="dropdown-item">Terror</a></li>
-                    <li><a className="dropdown-item">Fantasía</a></li>
-                    <li><a className="dropdown-item">Ciencia Ficción</a></li>
+                    <li><Link className="dropdown-item" to="/categoria/Accion">Acción</Link></li>
+                    <li><Link className="dropdown-item" to="/categoria/Romance">Romance</Link></li>
+                    <li><Link className="dropdown-item" to="/categoria/Terror">Terror</Link></li>
+                    <li><Link className="dropdown-item" to="/categoria/Fantasia">Fantasía</Link></li>
+                    <li><Link className="dropdown-item" to="/categoria/Sci-Fi">Ciencia Ficción</Link></li>
                 </ul>
             </div>
-
 
             <div className="mx-auto position-relative">
                 <input className="form-control" type="search" placeholder="Buscar obras..."

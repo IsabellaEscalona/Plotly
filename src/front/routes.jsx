@@ -20,6 +20,7 @@ import { CreateHistory } from "./pages/CreateHistory";
 import { Biblioteca } from "./pages/Biblioteca";
 import { UserProfile } from "./pages/UserProfile";
 import { MejoresObras } from "./pages/MejoresObras";
+import { CategoriaPage } from "./pages/CategoriaPage"
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -46,6 +47,7 @@ export const router = createBrowserRouter(
         <Route path="/biblioteca" element={<Biblioteca />} />
         <Route path="/MejoresObras" element={<MejoresObras />} />
         <Route path="/comic/:id" element={<ComicPage />} />
+        <Route path="/categoria/:genero" element={<CategoriaPage />} />
         <Route path="/reset-password" element={<ResetPassword />} />
       </Route>
     )
