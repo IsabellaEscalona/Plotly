@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef  } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { Link } from "react-router-dom"
 import placeholderImg from "../assets/img/placeholder.jpg";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
@@ -64,6 +64,7 @@ const Carrusel = ({ titulo, obras, mensajeVacio = "Todavía no hay obras para mo
 export const Home = () => {
     const { store } = useGlobalReducer();
     const [novedades, setNovedades] = useState([]);
+    const [seguidos, setSeguidos] = useState([]);
 
     useEffect(() => {
         fetch(import.meta.env.VITE_BACKEND_URL + "/api/feed")
@@ -79,6 +80,24 @@ export const Home = () => {
             })
             .catch(err => console.error("Error cargando el feed:", err));
     }, []);
+    useEffect(() => {
+        const token = localStorage.getItem('token')
+        if (!token) return
+        fetch(import.meta.env.VITE_BACKEND_URL + "/api/feed/following", {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+            .then(r => r.ok ? r.json() : [])
+            .then(data => {
+                const obras = data.map(c => ({
+                    id: c.id,
+                    titulo: c.title,
+                    autor: c.autor,
+                    portada: c.cover
+                }));
+                setSeguidos(obras);
+            })
+            .catch(err => console.error("Error cargando seguidos:", err));
+    }, []);
 
     return (
         <div className="d-flex">
@@ -87,10 +106,9 @@ export const Home = () => {
                 <h4 className="mb-4 fw-semibold">
                     ¡Bienvenido, {store?.user?.username || "lector"}!
                 </h4>
-                {/* Aun no funcional, falta terminar y pulir los seguidores */}
                 <Carrusel
                     titulo="Seguidos"
-                    obras={[]}
+                    obras={seguidos}
                     mensajeVacio="Sigue a artistas para ver sus obras"
                 />
                 <Carrusel titulo="Novedades" obras={novedades} />

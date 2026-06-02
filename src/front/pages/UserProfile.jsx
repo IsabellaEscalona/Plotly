@@ -10,11 +10,19 @@ export const UserProfile = () => {
     const [perfil, setPerfil] = useState(null)
     const [usuarioActual, setUsuarioActual] = useState(null)
     const [bioExpandida, setBioExpandida] = useState(false)
+    const [siguiendo, setSiguiendo] = useState(false)
+    const [seguidores, setSeguidores] = useState(0)
 
     useEffect(() => {
-        fetch(import.meta.env.VITE_BACKEND_URL + `/api/profile/${username}`)
+        const token = localStorage.getItem('token')
+        const headers = token ? { 'Authorization': 'Bearer ' + token } : {}
+        fetch(import.meta.env.VITE_BACKEND_URL + `/api/profile/${username}`, { headers })
             .then(r => r.json())
-            .then(data => setPerfil(data))
+            .then(data => {
+                setPerfil(data)
+                setSiguiendo(!!data.is_following)
+                setSeguidores(data.followers_count || 0)
+            })
     }, [username])
 
     useEffect(() => {
@@ -26,6 +34,20 @@ export const UserProfile = () => {
             .then(r => r.ok ? r.json() : null)
             .then(data => setUsuarioActual(data))
     }, [])
+
+    const toggleSeguir = async () => {
+        const token = localStorage.getItem('token')
+        if (!token) { navigate('/login'); return }
+        const metodo = siguiendo ? 'DELETE' : 'POST'
+        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + `/api/follow/${perfil.id}`, {
+            method: metodo,
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        if (resp.ok) {
+            setSeguidores(prev => siguiendo ? prev - 1 : prev + 1)
+            setSiguiendo(!siguiendo)
+        }
+    }
 
     if (!perfil) return <p className="text-center mt-5" style={{ color: "#e0e0ff" }}>Cargando...</p>
     if (perfil.error) return <h1 className="text-center mt-5" style={{ color: "#e0e0ff" }}>Usuario no encontrado</h1>
@@ -87,6 +109,18 @@ export const UserProfile = () => {
                                 <i className="fa-solid fa-gear me-1"></i>Ajustes
                             </button>
                         )}
+                        {!esMiPerfil && usuarioActual && (
+                            <button
+                                className="btn btn-sm mt-3"
+                                onClick={toggleSeguir}
+                                style={siguiendo
+                                    ? { backgroundColor: 'transparent', border: '1px solid #c8b8ff', color: '#c8b8ff' }
+                                    : { backgroundColor: '#c8b8ff', border: 'none', color: '#12121f', fontWeight: 600 }}
+                            >
+                                <i className={`fa-solid me-1 ${siguiendo ? 'fa-check' : 'fa-plus'}`}></i>
+                                {siguiendo ? 'Siguiendo' : 'Seguir'}
+                            </button>
+                        )}
                     </div>
                     <div className="col-9 profile-right pt-3">
                         <div className="d-flex gap-4 mb-4">
@@ -95,11 +129,11 @@ export const UserProfile = () => {
                                 <p className="mb-0 small" style={{ color: "#7070aa" }}>Posts</p>
                             </div>
                             <div className="text-center">
-                                <p className="mb-0 fw-bold" style={{ color: "#e0e0ff" }}>0</p>
+                                <p className="mb-0 fw-bold" style={{ color: "#e0e0ff" }}>{seguidores}</p>
                                 <p className="mb-0 small" style={{ color: "#7070aa" }}>Seguidores</p>
                             </div>
                             <div className="text-center">
-                                <p className="mb-0 fw-bold" style={{ color: "#e0e0ff" }}>0</p>
+                                <p className="mb-0 fw-bold" style={{ color: "#e0e0ff" }}>{perfil.following_count}</p>
                                 <p className="mb-0 small" style={{ color: "#7070aa" }}>Seguidos</p>
                             </div>
                         </div>
