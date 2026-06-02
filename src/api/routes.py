@@ -134,6 +134,25 @@ def update_profile():
     }), 200
 
 
+@api.route('/profile-picture', methods=['PUT'])
+@jwt_required()
+def update_profile_picture():
+    user_id = get_jwt_identity()
+    user = db.session.get(User, user_id)
+    if not user or not user.perfil:
+        return jsonify({'error': 'Perfil no encontrado'}), 404
+    if 'profile_picture' not in request.files:
+        return jsonify({'error': 'No se envió ninguna imagen'}), 400
+    file = request.files['profile_picture']
+    result = cloudinary.uploader.upload(file, folder='profiles')
+    user.perfil.profile_picture = result['secure_url']
+    db.session.commit()
+    return jsonify({
+        'message': 'Foto de perfil actualizada',
+        'profile_picture': result['secure_url']
+    }), 200
+
+
 @api.route('/reset-password', methods=['PUT'])
 def reset_password():
     body = request.json
