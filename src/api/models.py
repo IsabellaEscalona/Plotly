@@ -102,8 +102,8 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     title = db.Column(db.String(200), nullable=False)
     category = db.Column(db.Enum(Enum_Category_Post), nullable=False)
-    principal_genre = db.Column(db.Enum(Enum_Genre_post), nullable=False)
-    secondary_genre = db.Column(db.Enum(Enum_Genre_post))
+    principal_genre = db.Column(db.Enum(Enum_Genre_post,create_type=False), nullable=False)
+    secondary_genre = db.Column(db.Enum(Enum_Genre_post, create_type=False))
     description = db.Column(db.String(1000))
     cover = db.Column(db.String(200))
 

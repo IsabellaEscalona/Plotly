@@ -5,10 +5,20 @@ import useGlobalReducer from '../hooks/useGlobalReducer'
 export const Settings = () => {
     const { store, dispatch } = useGlobalReducer()
     const navigate = useNavigate()
-    const [form, setForm] = useState({ username: '', email: '', bio: '', instagram: '', twitter: '', tipo: '', artistType: '' })
+    const [form, setForm] = useState({ username: '', email: '', bio: '', instagram: '', twitter: '', tipo: '', artistType: '', profile_picture: '' })
     const [pass, setPass] = useState({ actual: '', nueva: '', confirmar: '' })
+    const [preview, setPreview] = useState('https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp')
     const [mensaje, setMensaje] = useState('')
     const [error, setError] = useState('')
+
+    const handleFileChangeCover = (e) => {
+        const selectedFile = e.target.files[0]
+        if (selectedFile && selectedFile.type.startsWith('image/')) {
+            setForm({...form, profile_picture: selectedFile})
+            const objectUrl = URL.createObjectURL(selectedFile)
+            setPreview(objectUrl)
+        }
+    }
 
     useEffect(() => {
         const token = store.token || localStorage.getItem("token")
@@ -76,6 +86,12 @@ export const Settings = () => {
             {mensaje && <div className="alert alert-success">{mensaje}</div>}
             {error && <div className="alert alert-danger">{error}</div>}
             <div className="row g-3">
+                <div className="col-md-5">
+                    <label className="form-label">Profile Picture</label>
+                    {preview && <img className="rounded rounded-circle" src={preview} alt='Preview' style={{ 'width': '200px', 'height': '200px', 'objectFit': 'cover' }} />}
+                    <input className='form-control mt-1' type='file' accept='.jpg,.jpeg,.png,.webp' onChange={handleFileChangeCover} style={{ 'width': '200px' }} />
+                </div>
+                <div className='col-md-6'></div>
                 <div className="col-md-6">
                     <label className="form-label">Username</label>
                     <input className="form-control" name="username" value={form.username}
