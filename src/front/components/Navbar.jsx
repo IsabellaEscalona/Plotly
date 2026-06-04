@@ -18,8 +18,8 @@ export const Navbar = () => {
     const handleSearch = async (e) => {
         const value = e.target.value
         setQuery(value)
-        if (value.length < 3) { setResults([]); return }
-        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/search-books?q=" + value)
+        if (value.length < 2) { setResults([]); return }
+        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/search?q=" + encodeURIComponent(value))
         const data = await resp.json()
         setResults(data)
     }
@@ -50,11 +50,25 @@ export const Navbar = () => {
                     onFocus={() => setShowResults(true)}
                 />
                 {results.length > 0 && showResults && (
-                    <ul className="list-group position-absolute w-100" style={{ zIndex: 1000 }}>
-                        {results.slice(0, 5).map((book, i) => (
-                            <li key={i} className="list-group-item d-flex align-items-center gap-2">
-                                {book.cover && <img src={book.cover} style={{ height: "40px" }} />}
-                                <span>{book.title} - {book.author}</span>
+                    <ul className="list-group position-absolute w-100 shadow" style={{ zIndex: 1000, maxHeight: "320px", overflowY: "auto" }}>
+                        {results.slice(0, 6).map((obra) => (
+                            <li key={obra.id} className="list-group-item p-0" style={{ backgroundColor: "#1e1e2e", border: "1px solid #2a2a45" }}>
+                                <Link
+                                    to={`/comic/${obra.id}`}
+                                    className="d-flex align-items-center gap-2 p-2 text-decoration-none"
+                                    style={{ color: "#e0e0ff" }}
+                                    onClick={() => { setShowResults(false); setQuery(""); setResults([]) }}
+                                >
+                                    <img
+                                        src={obra.cover || ""}
+                                        alt={obra.title}
+                                        style={{ width: "32px", height: "44px", objectFit: "cover", borderRadius: "4px", flexShrink: 0, backgroundColor: "#2a2a45" }}
+                                    />
+                                    <div style={{ overflow: "hidden" }}>
+                                        <div className="fw-semibold text-truncate" style={{ fontSize: "0.9rem" }}>{obra.title}</div>
+                                        <div className="text-truncate" style={{ fontSize: "0.8rem", color: "#7070aa" }}>{obra.autor}</div>
+                                    </div>
+                                </Link>
                             </li>
                         ))}
                     </ul>

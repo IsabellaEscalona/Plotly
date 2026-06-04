@@ -1,43 +1,65 @@
-
 @import url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css);
 @import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap");
 
-.card {
-    box-shadow: 0px 4px 8px rgb(0 0 0 / 16%);
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 30px;
-    background-color: #fff;
-    border: none;
-}
-
-.card-body {
-    padding: 30px;
-}
 .btn-primary {
     border-color: #5a8dee !important;
     background-color: #5a8dee !important;
     color: #fff;
 }
-.kb-data-box {
+
+.create-form .form-control,
+.create-form .form-select {
+    background-color: #1e1e2e;
+    border: 1px solid #2a2a45;
+    color: #e0e0ff;
+}
+.create-form .form-control:focus,
+.create-form .form-select:focus {
+    background-color: #1e1e2e;
+    border-color: #c8b8ff;
+    color: #e0e0ff;
+    box-shadow: 0 0 0 0.2rem rgba(200, 184, 255, 0.25);
+}
+.create-form .form-control::placeholder {
+    color: #7070aa;
+}
+.create-form .form-select option {
+    background-color: #1e1e2e;
+    color: #e0e0ff;
+}
+
+.create-form .card {
+    background-color: #1e1e2e;
+    border: 1px solid #2a2a45;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 35%);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+.create-form .card-body {
+    padding: 30px;
+}
+.create-form .kb-data-box {
     width: 100%;
     flex: 1;
 }
-.kb-modal-data-title {
+.create-form .kb-modal-data-title {
     margin-bottom: 10px;
 }
-.kb-data-title h6 {
+.create-form .kb-data-title h6 {
     margin-bottom: 0;
     font-size: 15px;
     font-weight: 600;
+    color: #e0e0ff;
 }
-.kb-file-upload {
+.create-form .kb-file-upload {
     margin-bottom: 20px;
 }
-.file-upload-box {
-    border: 1px dashed #b6bed1;
-    background-color: #f0f2f7;
-    border-radius: 4px;
+
+.create-form .file-upload-box {
+    border: 2px dashed #3a3a5a;
+    background-color: #12121f;
+    border-radius: 8px;
     min-height: 150px;
     position: relative;
     overflow: hidden;
@@ -45,11 +67,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #8194aa;
+    color: #a0a0c0;
     font-weight: 400;
     font-size: 15px;
+    transition: border-color 0.2s;
 }
-.file-upload-box .file-upload-input {
+.create-form .file-upload-box:hover {
+    border-color: #c8b8ff;
+}
+.create-form .file-upload-box .file-upload-input {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -58,63 +84,66 @@
     opacity: 0;
     cursor: pointer;
 }
-.file-link{
-    color: #475f7b;
+.create-form .file-link {
+    color: #c8b8ff;
     text-decoration: underline;
     margin-left: 3px;
 }
-.file-upload-box .file-link:hover{
+.create-form .file-upload-box .file-link:hover {
     text-decoration: none;
 }
-.file-atc-box {
+
+.create-form .file-atc-box {
     display: flex;
     align-items: center;
     margin-bottom: 15px;
+    background-color: #2a2a45;
+    border-radius: 8px;
+    padding: 8px 12px;
 }
-.file-image {
-    /* width: 130px;
-    min-width: 130px;
-    height: 85px;
-    min-height: 85px; */
+.create-form .file-atc-box:last-child {
+    margin-bottom: 0;
+}
+.create-form .file-image {
     width: 130px;
     height: 85px;
     background-size: cover;
     border-radius: 5px;
     margin-right: 15px;
-    background-color: #eaecf1;
+    background-color: #1e1e2e;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 30px;
-    color: #475f7b;
+    color: #c8b8ff;
     padding: 3px;
+    flex-shrink: 0;
 }
-.file-image img{
+.create-form .file-image img {
     max-width: 100%;
     max-height: 100%;
     border-radius: 4px;
 }
-.file-detail {
+.create-form .file-detail {
     flex: 1;
     width: calc(100% - 210px);
 }
-.file-detail h6 {
+.create-form .file-detail h6 {
     word-break: break-all;
     font-size: 13px;
     font-weight: 500;
     line-height: 20px;
     margin-bottom: 8px;
+    color: #e0e0ff;
 }
-.file-actions {
-    display: -ms-flexbox;
+.create-form .file-actions {
     display: flex;
-    -ms-flex-wrap: wrap;
     flex-wrap: wrap;
     align-items: center;
 }
-.file-action-btn {
+.create-form .file-action-btn {
     font-size: 12px;
-    color: #8194aa;
+    color: #a0a0c0;
     line-height: 20px;
     font-weight: 400;
     margin-bottom: 0;
@@ -125,10 +154,7 @@
     margin-right: 15px;
     cursor: pointer;
 }
-.file-action-btn:hover {
-    color: #3d546f;
+.create-form .file-action-btn:hover {
+    color: #ff6b6b;
     text-decoration: underline;
-}
-.file-atc-box:last-child{
-    margin-bottom: 0;
 }

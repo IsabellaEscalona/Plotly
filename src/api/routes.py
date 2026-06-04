@@ -539,3 +539,17 @@ def get_feed():
             'comentarios': len(p.comment)
         })
     return jsonify(comics), 200
+
+@api.route('/search', methods=['GET'])
+def search_posts():
+    query = request.args.get('q', '').strip()
+    if not query:
+        return jsonify([]), 200
+    posts = Post.query.filter(Post.title.ilike(f'%{query}%')).order_by(Post.id.desc()).all()
+    resultados = []
+    for p in posts:
+        resultados.append({
+            **p.serialize(),
+            'autor': p.author.username
+        })
+    return jsonify(resultados), 200
