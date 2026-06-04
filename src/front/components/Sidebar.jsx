@@ -15,11 +15,6 @@ export const Sidebar = () => {
                     <i className="fa-solid fa-house"></i>
                     <span>Home</span>
                 </NavLink>
-                {/* no redirigen a ningún lado ya que todavia no tenemos estas partes */}
-                <span className="sidebar-link disabled-link">
-                    <i className="fa-solid fa-compass"></i>
-                    <span>Explorar</span>
-                </span>
                 <NavLink
                     to="/MejoresObras"
                     className={({ isActive }) =>
