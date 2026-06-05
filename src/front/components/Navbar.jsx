@@ -44,7 +44,14 @@ export const Navbar = () => {
             </div>
 
             <div className="mx-auto position-relative">
-                <input className="form-control" type="search" placeholder="Buscar obras..."
+                <input className="form-control buscador" type="search" placeholder="Buscar obras..."
+                    style={{
+                        backgroundColor: "#1e1e2e",
+                        color: "#e0e0ff",
+                        border: "1px solid #2a2a45",
+                        boxShadow: "none",
+                        outline: "none"
+                    }}
                     value={query} onChange={handleSearch}
                     onBlur={() => setTimeout(() => setShowResults(false), 200)}
                     onFocus={() => setShowResults(true)}

@@ -138,6 +138,33 @@ def get_following_feed():
         })
     return jsonify(comics), 200
 
+@api.route('/profile/<username>/followers', methods=['GET'])
+def get_user_followers(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    lista = []
+    for u in user.followers:
+        lista.append({
+            'username': u.username,
+            'profile_picture': u.perfil.profile_picture if u.perfil else None
+        })
+    return jsonify(lista), 200
+
+
+@api.route('/profile/<username>/following', methods=['GET'])
+def get_user_following(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    lista = []
+    for u in user.following:
+        lista.append({
+            'username': u.username,
+            'profile_picture': u.perfil.profile_picture if u.perfil else None
+        })
+    return jsonify(lista), 200
+
 
 @api.route('/change-password', methods=['PUT'])
 @jwt_required()

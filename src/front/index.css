@@ -1,3 +1,7 @@
 body {
     background-color: #12121f;
 }
+
+.buscador::placeholder {
+    color: #a0a0c0;
+}
