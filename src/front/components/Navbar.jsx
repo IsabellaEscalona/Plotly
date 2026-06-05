@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export const Navbar = () => {
     const { store, dispatch } = useGlobalReducer();
@@ -11,6 +11,17 @@ export const Navbar = () => {
         localStorage.clear();
         navigate("/login");
     };
+
+    const [miFoto, setMiFoto] = useState(null)
+    useEffect(() => {
+        const token = localStorage.getItem('token')
+        if (!token) return
+        fetch(import.meta.env.VITE_BACKEND_URL + '/api/me', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+            .then(r => r.ok ? r.json() : null)
+            .then(data => { if (data) setMiFoto(data.profile_picture) })
+    }, [])
 
     const [query, setQuery] = useState("")
     const [results, setResults] = useState([])
@@ -94,7 +105,9 @@ export const Navbar = () => {
             </div>
             <div className="dropdown ms-3">
                 <button className="btn btn-dark dropdown-toggle d-flex align-items-center gap-2" data-bs-toggle="dropdown">
-                    <i className="fas fa-user-circle" style={{ fontSize: "1.5rem" }}></i>
+                    {miFoto
+                        ? <img src={miFoto} alt="perfil" style={{ width: "32px", height: "32px", borderRadius: "50%", objectFit: "cover" }} />
+                        : <i className="fas fa-user-circle" style={{ fontSize: "1.5rem" }}></i>}
                 </button>
                 <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end">
                     <li><Link className="dropdown-item" to="/me">Mi Perfil</Link></li>

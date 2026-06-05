@@ -24,7 +24,6 @@ export const Biblioteca = () => {
     return (
         <div className="px-4 py-4" style={{ color: "#e0e0ff" }}>
             <h3 className="fw-bold mb-4">
-                <i className="fa-solid fa-bookmark me-2" style={{ color: "#c8b8ff" }}></i>
                 Biblioteca
             </h3>
 

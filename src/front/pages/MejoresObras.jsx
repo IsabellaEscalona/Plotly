@@ -22,7 +22,6 @@ export const MejoresObras = () => {
             <Sidebar />
             <div className="flex-grow-1 p-4" style={{ color: "#e0e0ff" }}>
                 <h4 className="mb-4 fw-semibold">
-                    <i className="fa-solid fa-star me-2" style={{ color: "#c8b8ff" }}></i>
                     Mejores Obras
                 </h4>
                 {obras === null ? (

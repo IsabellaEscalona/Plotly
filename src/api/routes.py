@@ -422,11 +422,13 @@ def get_comic(post_id):
             'id': c.id,
             'user_id': c.user_id,
             'usuario': autor.username if autor else 'desconocido',
+            'foto': autor.perfil.profile_picture if autor and autor.perfil else None,
             'texto': c.content
         })
     return jsonify({
         **post.serialize(),
         'autor': post.author.username,
+        'autor_foto': post.author.perfil.profile_picture if post.author.perfil else None,
         'paginas': paginas,
         'guardado': guardado,
         'comentarios': comentarios
