@@ -111,7 +111,7 @@ def update_profile():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
     profile = user.perfil
-    body = request.json
+    body = request.form
     user.username = body.get("username", user.username)
     user.email = body.get("email", user.email)
 
@@ -122,6 +122,14 @@ def update_profile():
     profile.bio = body.get("bio", profile.bio)
     profile.instagram = body.get("instagram", profile.instagram)
     profile.twitter = body.get("twitter", profile.twitter)
+
+    avatar = request.files.get('avatar')
+    print(request.files)
+    
+    """ result = cloudinary.uploader.upload(avatar, folder='avatar_user_plotly') """
+    """ if (avatar):
+        result = cloudinary.uploader.upload(avatar, folder='avatar_user_plotly')
+        profile.profile_picture = result['secure_url'] """
     if body.get("tipo"):
         profile.artist_type = Enum_Artist.COMIC_ARTIST if body[
             "tipo"] == 'Artista' else Enum_Artist.READER
