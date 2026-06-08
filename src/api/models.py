@@ -28,6 +28,26 @@ class User(db.Model):
 
     Post = db.relationship('Post', backref='author')
 
+    following = db.relationship(
+        'User',
+        secondary=follower,
+        primaryjoin=(follower.c.users_follower == id),
+        secondaryjoin=(follower.c.users_followed == id),
+        backref=db.backref('followers', lazy='dynamic'),
+        lazy='dynamic'
+    )
+
+    def follow(self, user):
+        if not self.is_following(user):
+            self.following.append(user)
+
+    def unfollow(self, user):
+        if self.is_following(user):
+            self.following.remove(user)
+
+    def is_following(self, user):
+        return self.following.filter(follower.c.users_followed == user.id).count() > 0
+
     def set_password(self, password):
         self.password = generate_password_hash(password)
 
@@ -102,7 +122,8 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     title = db.Column(db.String(200), nullable=False)
     category = db.Column(db.Enum(Enum_Category_Post), nullable=False)
-    principal_genre = db.Column(db.Enum(Enum_Genre_post,create_type=False), nullable=False)
+    principal_genre = db.Column(
+        db.Enum(Enum_Genre_post, create_type=False), nullable=False)
     secondary_genre = db.Column(db.Enum(Enum_Genre_post, create_type=False))
     description = db.Column(db.String(1000))
     cover = db.Column(db.String(200))
@@ -150,6 +171,7 @@ class Like(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
     liked = db.Column(db.Boolean, default=False)
+
 
 class Saved(db.Model):
     __tablename__ = 'saved'

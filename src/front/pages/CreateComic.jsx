@@ -153,15 +153,11 @@ export const CreateComic = () => {
         const token = store.token || localStorage.getItem('token')
 
         if (!token) navigate('/login')
-
     }, [store.token])
 
-
     return (
-
-
         <form onSubmit={handleSubmit}>
-            <div className="container py-5 text-align-center" style={{ maxWidth: '700px', color: '#e0e0ff' }}>
+            <div className="container py-5 text-center create-form" style={{ maxWidth: '700px', color: '#e0e0ff' }}>
                 <h2 className="mb-4">Detalles de nuevo comic</h2>
                 {error && <div className="alert alert-danger py-2">{error}</div>}
                 <div className="container d-flex">

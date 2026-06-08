@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom"
 import "./Profile.css"
 
 const MEDALLAS = ["#FFD700", "#C0C0C0", "#CD7F32"]
+const AVATAR_DEFAULT = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"
 
 export const UserProfile = () => {
     const { username } = useParams()
@@ -10,11 +11,21 @@ export const UserProfile = () => {
     const [perfil, setPerfil] = useState(null)
     const [usuarioActual, setUsuarioActual] = useState(null)
     const [bioExpandida, setBioExpandida] = useState(false)
+    const [siguiendo, setSiguiendo] = useState(false)
+    const [seguidores, setSeguidores] = useState(0)
+    const [modal, setModal] = useState(null)
+    const [lista, setLista] = useState([])
 
     useEffect(() => {
-        fetch(import.meta.env.VITE_BACKEND_URL + `/api/profile/${username}`)
+        const token = localStorage.getItem('token')
+        const headers = token ? { 'Authorization': 'Bearer ' + token } : {}
+        fetch(import.meta.env.VITE_BACKEND_URL + `/api/profile/${username}`, { headers })
             .then(r => r.json())
-            .then(data => setPerfil(data))
+            .then(data => {
+                setPerfil(data)
+                setSiguiendo(!!data.is_following)
+                setSeguidores(data.followers_count || 0)
+            })
     }, [username])
 
     useEffect(() => {
@@ -26,6 +37,32 @@ export const UserProfile = () => {
             .then(r => r.ok ? r.json() : null)
             .then(data => setUsuarioActual(data))
     }, [])
+
+    const toggleSeguir = async () => {
+        const token = localStorage.getItem('token')
+        if (!token) { navigate('/login'); return }
+        const metodo = siguiendo ? 'DELETE' : 'POST'
+        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + `/api/follow/${perfil.id}`, {
+            method: metodo,
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        if (resp.ok) {
+            setSeguidores(prev => siguiendo ? prev - 1 : prev + 1)
+            setSiguiendo(!siguiendo)
+        }
+    }
+
+    const abrirLista = async (tipo) => {
+        const token = localStorage.getItem('token')
+        if (!token) return 
+        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + `/api/profile/${username}/${tipo}`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        if (resp.ok) {
+            setLista(await resp.json())
+            setModal(tipo)
+        }
+    }
 
     if (!perfil) return <p className="text-center mt-5" style={{ color: "#e0e0ff" }}>Cargando...</p>
     if (perfil.error) return <h1 className="text-center mt-5" style={{ color: "#e0e0ff" }}>Usuario no encontrado</h1>
@@ -42,7 +79,7 @@ export const UserProfile = () => {
                 <div className="row">
                     <div className="col-3 profile-left">
                         <img
-                            src={perfil.profile_picture || "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"}
+                            src={perfil.profile_picture || AVATAR_DEFAULT}
                             alt="avatar"
                             className="profile-avatar"
                         />
@@ -87,6 +124,18 @@ export const UserProfile = () => {
                                 <i className="fa-solid fa-gear me-1"></i>Ajustes
                             </button>
                         )}
+                        {!esMiPerfil && usuarioActual && (
+                            <button
+                                className="btn btn-sm mt-3"
+                                onClick={toggleSeguir}
+                                style={siguiendo
+                                    ? { backgroundColor: 'transparent', border: '1px solid #c8b8ff', color: '#c8b8ff' }
+                                    : { backgroundColor: '#c8b8ff', border: 'none', color: '#12121f', fontWeight: 600 }}
+                            >
+                                <i className={`fa-solid me-1 ${siguiendo ? 'fa-check' : 'fa-plus'}`}></i>
+                                {siguiendo ? 'Siguiendo' : 'Seguir'}
+                            </button>
+                        )}
                     </div>
                     <div className="col-9 profile-right pt-3">
                         <div className="d-flex gap-4 mb-4">
@@ -94,12 +143,20 @@ export const UserProfile = () => {
                                 <p className="mb-0 fw-bold" style={{ color: "#e0e0ff" }}>{perfil.posts.length}</p>
                                 <p className="mb-0 small" style={{ color: "#7070aa" }}>Posts</p>
                             </div>
-                            <div className="text-center">
-                                <p className="mb-0 fw-bold" style={{ color: "#e0e0ff" }}>0</p>
+                            <div
+                                className="text-center"
+                                style={usuarioActual ? { cursor: "pointer" } : {}}
+                                onClick={usuarioActual ? () => abrirLista('followers') : undefined}
+                            >
+                                <p className="mb-0 fw-bold" style={{ color: "#e0e0ff" }}>{seguidores}</p>
                                 <p className="mb-0 small" style={{ color: "#7070aa" }}>Seguidores</p>
                             </div>
-                            <div className="text-center">
-                                <p className="mb-0 fw-bold" style={{ color: "#e0e0ff" }}>0</p>
+                            <div
+                                className="text-center"
+                                style={usuarioActual ? { cursor: "pointer" } : {}}
+                                onClick={usuarioActual ? () => abrirLista('following') : undefined}
+                            >
+                                <p className="mb-0 fw-bold" style={{ color: "#e0e0ff" }}>{perfil.following_count}</p>
                                 <p className="mb-0 small" style={{ color: "#7070aa" }}>Seguidos</p>
                             </div>
                         </div>
@@ -132,6 +189,51 @@ export const UserProfile = () => {
                     </div>
                 </div>
             </div>
+
+            {modal && (
+                <div
+                    onClick={() => setModal(null)}
+                    style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2000 }}
+                >
+                    <div
+                        onClick={e => e.stopPropagation()}
+                        style={{ backgroundColor: "#1e1e2e", border: "1px solid #2a2a45", borderRadius: "12px", width: "90%", maxWidth: "400px", maxHeight: "70vh", display: "flex", flexDirection: "column", overflow: "hidden" }}
+                    >
+                        <div className="d-flex justify-content-between align-items-center px-3 py-2" style={{ borderBottom: "1px solid #2a2a45" }}>
+                            <span className="fw-bold" style={{ color: "#e0e0ff" }}>
+                                {modal === 'followers' ? 'Seguidores' : 'Seguidos'}
+                            </span>
+                            <button onClick={() => setModal(null)} className="btn p-0" style={{ background: "none", border: "none", color: "#a0a0c0" }}>
+                                <i className="fa-solid fa-xmark" style={{ fontSize: "1.2rem" }}></i>
+                            </button>
+                        </div>
+                        <div style={{ overflowY: "auto" }}>
+                            {lista.length === 0 ? (
+                                <p className="text-center py-4 mb-0" style={{ color: "#7070aa" }}>
+                                    {modal === 'followers' ? 'Todavía no tiene seguidores' : 'Todavía no sigue a nadie'}
+                                </p>
+                            ) : (
+                                lista.map((u, i) => (
+                                    <Link
+                                        key={i}
+                                        to={`/profile/${u.username}`}
+                                        onClick={() => setModal(null)}
+                                        className="d-flex align-items-center gap-2 px-3 py-2 text-decoration-none"
+                                        style={{ color: "#e0e0ff" }}
+                                    >
+                                        <img
+                                            src={u.profile_picture || AVATAR_DEFAULT}
+                                            alt={u.username}
+                                            style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover" }}
+                                        />
+                                        <span className="fw-semibold">{u.username}</span>
+                                    </Link>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

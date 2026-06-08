@@ -5,7 +5,7 @@ import requests
 from flask import Flask, request, jsonify, url_for, Blueprint
 import cloudinary
 import cloudinary.uploader
-from api.models import db, User, Profile, Enum_Artist, TIPO_MAP, Post, Enum_Genre_post, Enum_Category_Post, Content_Post, Saved, Comment
+from api.models import db, User, Profile, Enum_Artist, TIPO_MAP, Post, Enum_Genre_post, Enum_Category_Post, Content_Post, Saved, Comment, Like
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -90,6 +90,82 @@ def show_own_profile():
     return jsonify(data), 200
 
 
+@api.route('/follow/<int:user_id>', methods=['POST'])
+@jwt_required()
+def follow_user(user_id):
+    current_id = int(get_jwt_identity())
+    if current_id == user_id:
+        return jsonify({'error': 'No puedes seguirte a ti mismo'}), 400
+    me = db.session.get(User, current_id)
+    target = db.session.get(User, user_id)
+    if not target:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    me.follow(target)
+    db.session.commit()
+    return jsonify({'message': f'Ahora sigues a {target.username}', 'following': True}), 200
+
+
+@api.route('/follow/<int:user_id>', methods=['DELETE'])
+@jwt_required()
+def unfollow_user(user_id):
+    current_id = int(get_jwt_identity())
+    me = db.session.get(User, current_id)
+    target = db.session.get(User, user_id)
+    if not target:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    me.unfollow(target)
+    db.session.commit()
+    return jsonify({'message': f'Dejaste de seguir a {target.username}', 'following': False}), 200
+
+
+@api.route('/feed/following', methods=['GET'])
+@jwt_required()
+def get_following_feed():
+    current_id = int(get_jwt_identity())
+    me = db.session.get(User, current_id)
+    seguidos_ids = [u.id for u in me.following]
+    if not seguidos_ids:
+        return jsonify([]), 200
+    posts = Post.query.filter(Post.user_id.in_(
+        seguidos_ids)).order_by(Post.id.desc()).all()
+    comics = []
+    for p in posts:
+        comics.append({
+            **p.serialize(),
+            'autor': p.author.username,
+            'guardados': len(p.saved),
+            'comentarios': len(p.comment)
+        })
+    return jsonify(comics), 200
+
+@api.route('/profile/<username>/followers', methods=['GET'])
+def get_user_followers(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    lista = []
+    for u in user.followers:
+        lista.append({
+            'username': u.username,
+            'profile_picture': u.perfil.profile_picture if u.perfil else None
+        })
+    return jsonify(lista), 200
+
+
+@api.route('/profile/<username>/following', methods=['GET'])
+def get_user_following(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    lista = []
+    for u in user.following:
+        lista.append({
+            'username': u.username,
+            'profile_picture': u.perfil.profile_picture if u.perfil else None
+        })
+    return jsonify(lista), 200
+
+
 @api.route('/change-password', methods=['PUT'])
 @jwt_required()
 def change_password():
@@ -139,6 +215,25 @@ def update_profile():
         "message": "perfil actualizado correctamente",
         "user": user.serialize(),
         "profile": profile.serialize()
+    }), 200
+
+
+@api.route('/profile-picture', methods=['PUT'])
+@jwt_required()
+def update_profile_picture():
+    user_id = get_jwt_identity()
+    user = db.session.get(User, user_id)
+    if not user or not user.perfil:
+        return jsonify({'error': 'Perfil no encontrado'}), 404
+    if 'profile_picture' not in request.files:
+        return jsonify({'error': 'No se envió ninguna imagen'}), 400
+    file = request.files['profile_picture']
+    result = cloudinary.uploader.upload(file, folder='profiles')
+    user.perfil.profile_picture = result['secure_url']
+    db.session.commit()
+    return jsonify({
+        'message': 'Foto de perfil actualizada',
+        'profile_picture': result['secure_url']
     }), 200
 
 
@@ -333,12 +428,15 @@ def get_comic(post_id):
         autor = User.query.get(c.user_id)
         comentarios.append({
             'id': c.id,
+            'user_id': c.user_id,
             'usuario': autor.username if autor else 'desconocido',
+            'foto': autor.perfil.profile_picture if autor and autor.perfil else None,
             'texto': c.content
         })
     return jsonify({
         **post.serialize(),
         'autor': post.author.username,
+        'autor_foto': post.author.perfil.profile_picture if post.author.perfil else None,
         'paginas': paginas,
         'guardado': guardado,
         'comentarios': comentarios
@@ -371,7 +469,25 @@ def unsave_comic(post_id):
         return jsonify({'message': 'No estaba guardado'}), 200
     db.session.delete(guardado)
     db.session.commit()
-    return jsonify({'message': 'Comic quitado de guardados'}), 200
+    return jsonify({'message': 'Comic removido de guardados'}), 200
+
+
+@api.route('/comic/<int:post_id>', methods=['DELETE'])
+@jwt_required()
+def delete_comic(post_id):
+    current_id = int(get_jwt_identity())
+    post = db.session.get(Post, post_id)
+    if not post:
+        return jsonify({'error': 'Comic no encontrado'}), 404
+    if post.user_id != current_id:
+        return jsonify({'error': 'No puedes borrar obras de otro usuario'}), 403
+    Content_Post.query.filter_by(post_id=post_id).delete()
+    Comment.query.filter_by(post_id=post_id).delete()
+    Like.query.filter_by(post_id=post_id).delete()
+    Saved.query.filter_by(post_id=post_id).delete()
+    db.session.delete(post)
+    db.session.commit()
+    return jsonify({'message': 'Obra eliminada'}), 200
 
 
 @api.route('/library', methods=['GET'])
@@ -405,7 +521,22 @@ def add_comment(post_id):
     return jsonify({'message': 'Comentario agregado'}), 201
 
 
+@api.route('/comment/<int:comment_id>', methods=['DELETE'])
+@jwt_required()
+def delete_comment(comment_id):
+    current_id = int(get_jwt_identity())
+    comment = db.session.get(Comment, comment_id)
+    if not comment:
+        return jsonify({'error': 'Comentario no encontrado'}), 404
+    if comment.user_id != current_id:
+        return jsonify({'error': 'No puedes borrar comentarios de otro usuario'}), 403
+    db.session.delete(comment)
+    db.session.commit()
+    return jsonify({'message': 'Comentario eliminado'}), 200
+
+
 @api.route('/profile/<username>', methods=['GET'])
+@jwt_required(optional=True)
 def get_profile(username):
     user = User.query.filter_by(username=username).first()
     if not user:
@@ -419,8 +550,17 @@ def get_profile(username):
         })
     posts.sort(key=lambda x: x['guardados'], reverse=True)
     data = user.perfil.serialize() if user.perfil else {}
+    data['id'] = user.id
     data['username'] = user.username
     data['posts'] = posts
+    data['followers_count'] = user.followers.count()
+    data['following_count'] = user.following.count()
+    data['is_following'] = False
+    current_id = get_jwt_identity()
+    if current_id:
+        me = db.session.get(User, int(current_id))
+        if me:
+            data['is_following'] = me.is_following(user)
     return jsonify(data), 200
 
 
@@ -436,3 +576,17 @@ def get_feed():
             'comentarios': len(p.comment)
         })
     return jsonify(comics), 200
+
+@api.route('/search', methods=['GET'])
+def search_posts():
+    query = request.args.get('q', '').strip()
+    if not query:
+        return jsonify([]), 200
+    posts = Post.query.filter(Post.title.ilike(f'%{query}%')).order_by(Post.id.desc()).all()
+    resultados = []
+    for p in posts:
+        resultados.append({
+            **p.serialize(),
+            'autor': p.author.username
+        })
+    return jsonify(resultados), 200

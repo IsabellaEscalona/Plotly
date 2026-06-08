@@ -88,7 +88,9 @@ export const Settings = () => {
                 setError('La nueva contraseña debe tener al menos 6 caracteres'); return
             }
         }
-        const body = Object.fromEntries(Object.entries(form).filter(([_, v]) => v !== ''))
+        const body = Object.fromEntries(
+            Object.entries(form).filter(([k, v]) => v !== '' && k !== 'profile_picture')
+        )
         const resp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/settings', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
@@ -99,6 +101,16 @@ export const Settings = () => {
         dispatch({ type: "set_user", payload: data.user })
         dispatch({ type: "set_profile", payload: data.profile })
         setMensaje("Perfil actualizado")
+        if (form.profile_picture instanceof File) {
+            const fd = new FormData()
+            fd.append('profile_picture', form.profile_picture)
+            const picResp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/profile-picture', {
+                method: 'PUT',
+                headers: { 'Authorization': 'Bearer ' + token },
+                body: fd
+            })
+            if (!picResp.ok) { setError('Error al subir la foto de perfil'); return }
+        }
         if (pass.actual) {
             const passResp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/change-password', {
                 method: 'PUT',
@@ -117,7 +129,6 @@ export const Settings = () => {
             }
         }
     }
-
     return (
         <form onSubmit={handleSubmit}>
             <div className="container py-5" style={{ maxWidth: '600px', color: '#e0e0ff' }}>

@@ -8,6 +8,7 @@ export const ComicPage = () => {
     const [obra, setObra] = useState(null)
     const [guardado, setGuardado] = useState(false)
     const [comentario, setComentario] = useState("")
+    const [usuarioActual, setUsuarioActual] = useState(null)
 
     const cargarComic = () => {
         const token = localStorage.getItem('token')
@@ -24,6 +25,16 @@ export const ComicPage = () => {
     useEffect(() => {
         cargarComic()
     }, [id])
+
+    useEffect(() => {
+        const token = localStorage.getItem('token')
+        if (!token) return
+        fetch(import.meta.env.VITE_BACKEND_URL + '/api/me', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+            .then(r => r.ok ? r.json() : null)
+            .then(data => setUsuarioActual(data))
+    }, [])
 
     const handleComentar = () => {
         const token = localStorage.getItem('token')
@@ -47,13 +58,13 @@ export const ComicPage = () => {
                 }
             })
     }
+
     const handleGuardar = () => {
         const token = localStorage.getItem('token')
         if (!token) {
             navigate('/login')
             return
         }
-
         fetch(import.meta.env.VITE_BACKEND_URL + `/api/save/${id}`, {
             method: guardado ? 'DELETE' : 'POST',
             headers: { 'Authorization': 'Bearer ' + token }
@@ -63,7 +74,29 @@ export const ComicPage = () => {
             })
     }
 
+    const handleEliminarObra = async () => {
+        if (!confirm("¿Seguro que quieres eliminar esta obra? No se puede deshacer.")) return
+        const token = localStorage.getItem('token')
+        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + `/api/comic/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        if (resp.ok) navigate('/')
+    }
+
+    const handleEliminarComentario = async (comentarioId) => {
+        if (!confirm("¿Eliminar comentario?")) return
+        const token = localStorage.getItem('token')
+        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + `/api/comment/${comentarioId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        if (resp.ok) cargarComic()
+    }
+
     if (!obra) return <p className="text-center mt-5" style={{ color: "#e0e0ff" }}>Cargando...</p>
+
+    const esMiObra = usuarioActual && obra.user_id === usuarioActual.id
 
     return (
         <div style={{ color: "#ffffff" }}>
@@ -75,8 +108,12 @@ export const ComicPage = () => {
                 />
                 <div className="flex-grow-1">
                     <h3 className="fw-bold mb-1">{obra.title}</h3>
-                    <p className="mb-2">
-                        <i className="fa-solid fa-user me-2"></i>
+                    <p className="mb-2 d-flex align-items-center gap-2">
+                        <img
+                            src={obra.autor_foto || "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"}
+                            alt={obra.autor}
+                            style={{ width: "28px", height: "28px", borderRadius: "50%", objectFit: "cover" }}
+                        />
                         <Link to={`/profile/${obra.autor}`} style={{ color: "#ffffff", textDecoration: "none" }}>{obra.autor}</Link>
                     </p>
                     <div className="d-flex gap-2 mb-2">
@@ -98,6 +135,16 @@ export const ComicPage = () => {
                         >
                             <i className={`fa-${guardado ? "solid" : "regular"} fa-bookmark`}></i>
                         </button>
+                        {esMiObra && (
+                            <button
+                                className="btn px-3"
+                                onClick={handleEliminarObra}
+                                style={{ backgroundColor: "#2a2a45", color: "#ff6b6b", border: "none" }}
+                                title="Eliminar obra"
+                            >
+                                <i className="fa-solid fa-trash me-2"></i>Eliminar obra
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -131,25 +178,37 @@ export const ComicPage = () => {
                     </button>
                 </div>
                 <div className="d-flex flex-column gap-4">
-                    {[...(obra.comentarios || [])].sort((a, b) => b.id - a.id).map(c => (
-                        <div key={c.id} className="d-flex gap-3">
-                            <Link to={`/profile/${c.usuario}`} style={{ flexShrink: 0 }}>
-                                <div style={{
-                                    width: "40px", height: "40px", borderRadius: "50%",
-                                    backgroundColor: "#2a2a45",
-                                    display: "flex", alignItems: "center", justifyContent: "center"
-                                }}>
-                                    <i className="fa-solid fa-user" style={{ color: "#c8b8ff" }}></i>
-                                </div>
-                            </Link>
-                            <div>
-                                <Link to={`/profile/${c.usuario}`} className="fw-bold mb-1 d-block" style={{ color: "#ffffff", fontSize: "0.9rem", textDecoration: "none" }}>
-                                    {c.usuario}
+                    {[...(obra.comentarios || [])].sort((a, b) => b.id - a.id).map(c => {
+                        const esMiComentario = usuarioActual && c.user_id === usuarioActual.id
+                        return (
+                            <div key={c.id} className="d-flex gap-3 align-items-start">
+                                <Link to={`/profile/${c.usuario}`} style={{ flexShrink: 0 }}>
+                                    {c.foto
+                                        ? <img src={c.foto} alt={c.usuario} style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover" }} />
+                                        : <div style={{ width: "40px", height: "40px", borderRadius: "50%", backgroundColor: "#2a2a45", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                            <i className="fa-solid fa-user" style={{ color: "#c8b8ff" }}></i>
+                                          </div>
+                                          }
                                 </Link>
-                                <p className="mb-0" style={{ color: "#b0b0cc", fontSize: "0.95rem" }}>{c.texto}</p>
+                                <div>
+                                    <Link to={`/profile/${c.usuario}`} className="fw-bold mb-1 d-block" style={{ color: "#ffffff", fontSize: "0.9rem", textDecoration: "none" }}>
+                                        {c.usuario}
+                                    </Link>
+                                    <p className="mb-0" style={{ color: "#b0b0cc", fontSize: "0.95rem" }}>{c.texto}</p>
+                                </div>
+                                {esMiComentario && (
+                                    <button
+                                        className="btn btn-sm p-0 ms-auto"
+                                        onClick={() => handleEliminarComentario(c.id)}
+                                        style={{ color: "#7070aa", background: "none", border: "none" }}
+                                        title="Eliminar comentario"
+                                    >
+                                        <i className="fa-solid fa-trash"></i>
+                                    </button>
+                                )}
                             </div>
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
             </div>
         </div>
