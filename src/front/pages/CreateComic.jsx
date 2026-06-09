@@ -90,9 +90,18 @@ export const CreateComic = () => {
         }
     }
 
+    const MAX_SIZE = 10 * 1024 * 1024
+    
     const handleFileChangeCover = (e) => {
         const selectedFile = e.target.files[0]
-        if (selectedFile && selectedFile.type.startsWith('image/')) {
+        if (!selectedFile) return
+        if (selectedFile.size > MAX_SIZE) {
+            setError('La portada supera los 10MB. Elija una imagen más liviana.')
+            e.target.value = ''
+            return
+        }
+        if (selectedFile.type.startsWith('image/')) {
+            setError('')
             setCover(selectedFile)
             const objectUrl = URL.createObjectURL(selectedFile)
             setPreview(objectUrl)
@@ -100,29 +109,30 @@ export const CreateComic = () => {
     }
 
     const handleFileChangeComic = (e) => {
-        // --For Multiple File Input
-        let images = [];
-        for (let i = 0; i < e.target.files.length; i++) {
-            images.push((e.target.files[i]));
-            let reader = new FileReader();
-            let file = e.target.files[i];
-            reader.onloadend = () => {
-                SetSelectedFile((preValue) => {
-                    return [
-                        ...preValue,
-                        {
-                            id: shortid.generate(),
-                            filename: e.target.files[i].name,
-                            fileimage: reader.result,
-                        }
-                    ]
-                });
-            }
-            if (e.target.files[i]) {
-                reader.readAsDataURL(file);
-            }
+        const seleccionados = Array.from(e.target.files)
+        const grandes = seleccionados.filter(f => f.size > MAX_SIZE)
+        const validos = seleccionados.filter(f => f.size <= MAX_SIZE)
+        if (grandes.length > 0) {
+            setError(`Estos archivos superan los 10MB y no se agregaron: ${grandes.map(f => f.name).join(', ')}`)
+        } else {
+            setError('')
         }
-        setFiles(images)
+        for (let i = 0; i < validos.length; i++) {
+            let reader = new FileReader();
+            let file = validos[i];
+            reader.onloadend = () => {
+                SetSelectedFile((preValue) => [
+                    ...preValue,
+                    {
+                        id: shortid.generate(),
+                        filename: file.name,
+                        fileimage: reader.result,
+                    }
+                ]);
+            }
+            reader.readAsDataURL(file);
+        }
+        setFiles(validos)
     }
 
     const DeleteSelectFile = (id) => {
@@ -154,6 +164,8 @@ export const CreateComic = () => {
 
         if (!token) navigate('/login')
     }, [store.token])
+
+
 
     return (
         <form onSubmit={handleSubmit}>
@@ -225,6 +237,7 @@ export const CreateComic = () => {
                                             <div className="file-upload-box">
                                                 <input type="file" id="fileupload" className="file-upload-input" onChange={handleFileChangeComic} multiple accept='.jpg,.jpeg,.png,.webp' />
                                                 <span>Arrastrar y soltar o <span className="file-link">elija sus archivos</span></span>
+                                                <small className="d-block mt-2" style={{ color: '#888aaa' }}>Máximo 10MB por archivo</small>
                                             </div>
                                         </div>
                                         <div className="kb-attach-box mb-3">
