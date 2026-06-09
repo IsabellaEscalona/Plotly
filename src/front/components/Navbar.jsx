@@ -36,86 +36,90 @@ export const Navbar = () => {
     }
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3 px-lg-4">
             <Link className="navbar-brand d-flex align-items-center gap-2" to="/">
                 <span style={{ fontSize: "1.5rem" }}><i className="fa-solid fa-cubes"></i></span>
                 <span className="fw-bold">Plotly</span>
             </Link>
-            <div className="dropdown ms-3">
-                <button className="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown">
-                    Categorías
-                </button>
-                <ul className="dropdown-menu dropdown-menu-dark">
-                    <li><Link className="dropdown-item" to="/categoria/Accion">Acción</Link></li>
-                    <li><Link className="dropdown-item" to="/categoria/Romance">Romance</Link></li>
-                    <li><Link className="dropdown-item" to="/categoria/Terror">Terror</Link></li>
-                    <li><Link className="dropdown-item" to="/categoria/Fantasia">Fantasía</Link></li>
-                    <li><Link className="dropdown-item" to="/categoria/Sci-Fi">Ciencia Ficción</Link></li>
-                </ul>
-            </div>
-
-            <div className="mx-auto position-relative col-sm-2">
-                <input className="form-control buscador" type="search" placeholder="Buscar obras..."
-                    style={{
-                        backgroundColor: "#1e1e2e",
-                        color: "#e0e0ff",
-                        border: "1px solid #2a2a45",
-                        boxShadow: "none",
-                        outline: "none"
-                    }}
-                    value={query} onChange={handleSearch}
-                    onBlur={() => setTimeout(() => setShowResults(false), 200)}
-                    onFocus={() => setShowResults(true)}
-                />
-                {results.length > 0 && showResults && (
-                    <ul className="list-group position-absolute w-100 shadow" style={{ zIndex: 1000, maxHeight: "320px", overflowY: "auto" }}>
-                        {results.slice(0, 6).map((obra) => (
-                            <li key={obra.id} className="list-group-item p-0" style={{ backgroundColor: "#1e1e2e", border: "1px solid #2a2a45" }}>
-                                <Link
-                                    to={`/comic/${obra.id}`}
-                                    className="d-flex align-items-center gap-2 p-2 text-decoration-none"
-                                    style={{ color: "#e0e0ff" }}
-                                    onClick={() => { setShowResults(false); setQuery(""); setResults([]) }}
-                                >
-                                    <img
-                                        src={obra.cover || ""}
-                                        alt={obra.title}
-                                        style={{ width: "32px", height: "44px", objectFit: "cover", borderRadius: "4px", flexShrink: 0, backgroundColor: "#2a2a45" }}
-                                    />
-                                    <div style={{ overflow: "hidden" }}>
-                                        <div className="fw-semibold text-truncate" style={{ fontSize: "0.9rem" }}>{obra.title}</div>
-                                        <div className="text-truncate" style={{ fontSize: "0.8rem", color: "#7070aa" }}>{obra.autor}</div>
-                                    </div>
-                                </Link>
-                            </li>
-                        ))}
+            <div className="d-flex align-items-center gap-2 order-lg-last">
+                <div className="dropdown">
+                    <button className="btn btn-dark dropdown-toggle d-flex align-items-center gap-2" data-bs-toggle="dropdown">
+                        {miFoto
+                            ? <img src={miFoto} alt="perfil" style={{ width: "32px", height: "32px", borderRadius: "50%", objectFit: "cover" }} />
+                            : <i className="fas fa-user-circle" style={{ fontSize: "1.5rem" }}></i>}
+                    </button>
+                    <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                        <li><Link className="dropdown-item" to="/me">Mi Perfil</Link></li>
+                        <li><Link className="dropdown-item" to="/biblioteca">Biblioteca</Link></li>
+                        <li><Link className="dropdown-item" to="/settings">Configuración</Link></li>
+                        <li><hr className="dropdown-divider" /></li>
+                        <li><button className="dropdown-item text-danger" onClick={handleLogout}>Cerrar sesión</button></li>
                     </ul>
-                )}
-            </div>
-
-            {/* ddisponible cómic, falta escritura */}
-            <div className="dropdown ms-3">
-                <button className="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown">
-                    Subir
+                </div>
+                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Menú">
+                    <span className="navbar-toggler-icon"></span>
                 </button>
-                <ul className="dropdown-menu dropdown-menu-dark">
-                    <li><Link className="dropdown-item" to="/newComic">Cómic</Link></li>
-                    <li><Link className="dropdown-item" to="/newHistory">Escritura</Link></li>
-                </ul>
             </div>
-            <div className="dropdown ms-3">
-                <button className="btn btn-dark dropdown-toggle d-flex align-items-center gap-2" data-bs-toggle="dropdown">
-                    {miFoto
-                        ? <img src={miFoto} alt="perfil" style={{ width: "32px", height: "32px", borderRadius: "50%", objectFit: "cover" }} />
-                        : <i className="fas fa-user-circle" style={{ fontSize: "1.5rem" }}></i>}
-                </button>
-                <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end">
-                    <li><Link className="dropdown-item" to="/me">Mi Perfil</Link></li>
-                    <li><Link className="dropdown-item" to="/biblioteca">Biblioteca</Link></li>
-                    <li><Link className="dropdown-item" to="/settings">Configuración</Link></li>
-                    <li><hr className="dropdown-divider" /></li>
-                    <li><button className="dropdown-item text-danger" onClick={handleLogout}>Cerrar sesión</button></li>
-                </ul>
+            <div className="collapse navbar-collapse" id="navMain">
+                <div className="dropdown ms-lg-3 my-2 my-lg-0">
+                    <button className="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown">
+                        Categorías
+                    </button>
+                    <ul className="dropdown-menu dropdown-menu-dark">
+                        <li><Link className="dropdown-item" to="/categoria/Accion">Acción</Link></li>
+                        <li><Link className="dropdown-item" to="/categoria/Romance">Romance</Link></li>
+                        <li><Link className="dropdown-item" to="/categoria/Terror">Terror</Link></li>
+                        <li><Link className="dropdown-item" to="/categoria/Fantasia">Fantasía</Link></li>
+                        <li><Link className="dropdown-item" to="/categoria/Sci-Fi">Ciencia Ficción</Link></li>
+                    </ul>
+                </div>
+                <div className="position-relative my-2 my-lg-0 ms-lg-3 flex-lg-grow-1" style={{ maxWidth: "480px" }}>
+                    <input className="form-control buscador" type="search" placeholder="Buscar obras..."
+                        style={{
+                            backgroundColor: "#1e1e2e",
+                            color: "#e0e0ff",
+                            border: "1px solid #2a2a45",
+                            boxShadow: "none",
+                            outline: "none"
+                        }}
+                        value={query} onChange={handleSearch}
+                        onBlur={() => setTimeout(() => setShowResults(false), 200)}
+                        onFocus={() => setShowResults(true)}
+                    />
+                    {results.length > 0 && showResults && (
+                        <ul className="list-group position-absolute w-100 shadow" style={{ zIndex: 1000, maxHeight: "320px", overflowY: "auto" }}>
+                            {results.slice(0, 6).map((obra) => (
+                                <li key={obra.id} className="list-group-item p-0" style={{ backgroundColor: "#1e1e2e", border: "1px solid #2a2a45" }}>
+                                    <Link
+                                        to={`/comic/${obra.id}`}
+                                        className="d-flex align-items-center gap-2 p-2 text-decoration-none"
+                                        style={{ color: "#e0e0ff" }}
+                                        onClick={() => { setShowResults(false); setQuery(""); setResults([]) }}
+                                    >
+                                        <img
+                                            src={obra.cover || ""}
+                                            alt={obra.title}
+                                            style={{ width: "32px", height: "44px", objectFit: "cover", borderRadius: "4px", flexShrink: 0, backgroundColor: "#2a2a45" }}
+                                        />
+                                        <div style={{ overflow: "hidden" }}>
+                                            <div className="fw-semibold text-truncate" style={{ fontSize: "0.9rem" }}>{obra.title}</div>
+                                            <div className="text-truncate" style={{ fontSize: "0.8rem", color: "#7070aa" }}>{obra.autor}</div>
+                                        </div>
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+                <div className="dropdown ms-lg-3 my-2 my-lg-0">
+                    <button className="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown">
+                        Subir
+                    </button>
+                    <ul className="dropdown-menu dropdown-menu-dark">
+                        <li><Link className="dropdown-item" to="/newComic">Cómic</Link></li>
+                        <li><Link className="dropdown-item" to="/newHistory">Escritura</Link></li>
+                    </ul>
+                </div>
             </div>
         </nav>
     );

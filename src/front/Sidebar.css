@@ -1,10 +1,26 @@
 .plotly-sidebar {
-    width: 160px;
-    min-height: calc(100vh - 56px);
-    background-color: #1a1a2e;
-    border-right: 1px solid #2a2a45;
+    --bs-offcanvas-bg: #1a1a2e;
+    --bs-offcanvas-color: #e0e0ff;
+    --bs-offcanvas-width: 200px;
+    color: #e0e0ff;
+}
+
+@media (min-width: 992px) {
+    .plotly-sidebar {
+        width: 160px;
+        min-height: calc(100vh - 56px);
+        background-color: #1a1a2e !important;
+        border-right: 1px solid #2a2a45;
+        flex-shrink: 0;
+    }
+}
+
+.plotly-sidebar .offcanvas-body {
     padding: 1.5rem 0;
-    flex-shrink: 0;
+}
+
+.plotly-sidebar .offcanvas-header {
+    border-bottom: 1px solid #2a2a45;
 }
 
 .sidebar-nav {

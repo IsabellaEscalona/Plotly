@@ -103,6 +103,9 @@ export const Home = () => {
         <div className="d-flex">
             <Sidebar />
             <div className="flex-grow-1 p-4" style={{ color: "#e0e0ff", minWidth: 0 }}>
+                <button className="btn btn-dark d-lg-none mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+                    <i className="fa-solid fa-bars me-2"></i>Menú
+                </button>
                 <h4 className="mb-4 fw-semibold">
                     ¡Bienvenido, {store?.user?.username || "lector"}!
                 </h4>

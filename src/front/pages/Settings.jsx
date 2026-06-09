@@ -136,10 +136,10 @@ export const Settings = () => {
                 {mensaje && <div className="alert alert-success">{mensaje}</div>}
                 {error && <div className="alert alert-danger">{error}</div>}
                 <div className="row g-3">
-                    <div className="col-md-5">
-                        <label className="form-label">Profile Picture</label>
-                        {preview && <img className="rounded rounded-circle" src={preview} alt='Preview' style={{ 'width': '200px', 'height': '200px', 'objectFit': 'cover' }} />}
-                        <input className='form-control mt-1' type='file' accept='.jpg,.jpeg,.png,.webp' onChange={handleFileChangeCover} style={{ 'width': '200px' }} />
+                    <div className="col-12 col-md-5 d-flex flex-column align-items-center align-items-md-start">
+                        <label className="form-label">Foto de perfil</label>
+                        {preview && <img className="rounded-circle" src={preview} alt='Vista previa' style={{ width: '200px', height: '200px', objectFit: 'cover' }} />}
+                        <input className='form-control mt-2' type='file' accept='.jpg,.jpeg,.png,.webp' onChange={handleFileChangeCover} style={{ width: '200px' }} />
                     </div>
                     <div className='col-md-6'></div>
                     <div className="col-md-6">

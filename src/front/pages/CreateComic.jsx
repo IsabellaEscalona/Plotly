@@ -172,15 +172,15 @@ export const CreateComic = () => {
             <div className="container py-5 text-center create-form" style={{ maxWidth: '700px', color: '#e0e0ff' }}>
                 <h2 className="mb-4">Detalles de nuevo comic</h2>
                 {error && <div className="alert alert-danger py-2">{error}</div>}
-                <div className="container d-flex">
+                <div className="container d-flex flex-column flex-md-row gap-4 align-items-center align-items-md-start">
 
-                    <div className="col-4 justify-content-center">
+                    <div className="d-flex flex-column align-items-center align-items-md-start flex-shrink-0">
                         <h5 className="pb-2">Portada</h5>
                         {preview && <img className="rounded rounded-2" src={preview} alt='Preview' style={{ 'width': '200px', 'height': '300px', 'objectFit': 'cover' }} />}
                         <input className='form-control mt-1' type='file' accept='.jpg,.jpeg,.png,.webp' onChange={handleFileChangeCover} style={{ 'width': '200px' }} />
                     </div>
 
-                    <div className="col-9 mx-4">
+                    <div className="flex-grow-1 w-100">
                         <input
                             className="form-control my-3"
                             type="text"
