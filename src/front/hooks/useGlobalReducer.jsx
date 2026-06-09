@@ -32,25 +32,28 @@ export function StoreProvider({ children }) {
     }
 
     const getProfile = async () => {
+        const token = store.token
+        if (!token) return
+        try {
+            const resp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/me', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            })
 
-        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/me', {
-
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${store.token}`
+            if (resp.status === 401 || resp.status === 422) {
+                localStorage.removeItem('token')
+                localStorage.removeItem('user')
+                localStorage.removeItem('profile')
+                dispatch({ type: "set_token", payload: null })
+                dispatch({ type: "set_user", payload: null })
+                dispatch({ type: "set_profile", payload: null })
             }
-
-        })
-
-        if (resp.status == 401) {
-
-            localStorage.removeItem('token')
-            localStorage.removeItem('user')
-
+        } catch (err) {
+            console.error('No se pudo verificar la sesión:', err)
         }
-
-
     }
 
 
