@@ -54,7 +54,7 @@ export const Navbar = () => {
                 </ul>
             </div>
 
-            <div className="mx-auto position-relative">
+            <div className="mx-auto position-relative col-sm-2">
                 <input className="form-control buscador" type="search" placeholder="Buscar obras..."
                     style={{
                         backgroundColor: "#1e1e2e",
