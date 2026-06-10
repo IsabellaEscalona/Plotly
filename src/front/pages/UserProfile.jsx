@@ -28,6 +28,8 @@ export const UserProfile = () => {
             })
     }, [username])
 
+    console.log(perfil)
+
     useEffect(() => {
         const token = localStorage.getItem('token')
         if (!token) return
