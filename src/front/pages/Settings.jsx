@@ -54,8 +54,6 @@ export const Settings = () => {
             }
         }
 
-        console.log(form.profile_picture)
-
         const formData = new FormData();
         formData.append('username', form.username)
         formData.append('email', form.email)
@@ -66,34 +64,19 @@ export const Settings = () => {
         formData.append('artist_type', form.artistType)
         formData.append('avatar', form.profile_picture)
 
-        for (let pair of formData.entries()) {
-            console.log(pair[0], pair[1]);
-        }
-
         updating(formData)
     }
 
     const updating = async (form) => {
+        console.log('soy uptating')
         setMensaje(''); setError('')
         const token = store.token || localStorage.getItem("token")
-        if (!token) { setError("No hay sesión activa"); return }
-        if (pass.actual || pass.nueva || pass.confirmar) {
-            if (!pass.actual || !pass.nueva || !pass.confirmar) {
-                setError('Completa los tres campos de contraseña'); return
-            }
-            if (pass.nueva !== pass.confirmar) {
-                setError('Las contraseñas nuevas no coinciden'); return
-            }
-            if (pass.nueva.length < 6) {
-                setError('La nueva contraseña debe tener al menos 6 caracteres'); return
-            }
-        }
         const body = Object.fromEntries(
             Object.entries(form).filter(([k, v]) => v !== '' && k !== 'profile_picture')
         )
         const resp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/settings', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            headers: {'Authorization': 'Bearer ' + token },
             body: form
         })
         if (!resp.ok) { setError('Error al guardar el perfil'); return }
@@ -114,7 +97,7 @@ export const Settings = () => {
         if (pass.actual) {
             const passResp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/change-password', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                headers: {'Authorization': 'Bearer ' + token },
                 body: JSON.stringify({
                     "contraseña_actual": pass.actual,
                     "nueva_contraseña": pass.nueva

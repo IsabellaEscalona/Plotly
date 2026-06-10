@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { useState, useEffect } from "react";
+import logo from '../assets/img/logo-plotly.png'
 
 export const Navbar = () => {
     const { store, dispatch } = useGlobalReducer();
@@ -38,7 +39,7 @@ export const Navbar = () => {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3 px-lg-4">
             <Link className="navbar-brand d-flex align-items-center gap-2" to="/">
-                <span style={{ fontSize: "1.5rem" }}><i className="fa-solid fa-cubes"></i></span>
+                <span ><img src={logo} style={{ width: "50px" }}/></span>
                 <span className="fw-bold">Plotly</span>
             </Link>
             <div className="d-flex align-items-center gap-2 order-lg-last">

@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import logo from '../assets/img/logo-plotly.png'
 
 export const Signup = () => {
     const [email, setEmail] = useState("")
@@ -49,9 +50,9 @@ export const Signup = () => {
             <div
                 className="p-4 rounded-4 shadow"
                 style={{ backgroundColor: "#1e1e2e", width: "100%", maxWidth: "420px" }}>
-
+                    
                 <div className="text-center mb-4">
-                    <span style={{ fontSize: "2rem", color: "rgb(255, 255, 255)" }}><i class="fa-solid fa-cubes"></i></span>
+                    <span><img src={logo} style={{ width: "90px" }}/></span>
                     <h4 className="text-white fw-bold mt-1">Plotly</h4>
                     <p className="text-secondary mb-0">Crea tu cuenta</p>
                 </div>

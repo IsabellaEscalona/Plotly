@@ -228,6 +228,7 @@ def update_profile_picture():
     if 'profile_picture' not in request.files:
         return jsonify({'error': 'No se envió ninguna imagen'}), 400
     file = request.files['profile_picture']
+    print(file)
     result = cloudinary.uploader.upload(file, folder='profiles')
     user.perfil.profile_picture = result['secure_url']
     db.session.commit()

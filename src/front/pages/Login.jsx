@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx"
+import logo from '../assets/img/logo-plotly.png'
 
 export const Login = () => {
     const [email, setEmail] = useState("")
@@ -39,8 +40,8 @@ export const Login = () => {
                 className="p-4 rounded-4 shadow"
                 style={{ backgroundColor: "#1e1e2e", width: "100%", maxWidth: "420px" }}>
                 <div className="text-center mb-4">
-                    <span style={{ fontSize: "2rem", color: "rgb(255, 255, 255)" }}>
-                        <i className="fa-solid fa-cubes"></i>
+                    <span>
+                        <img src={logo} style={{ width: "90px" }}/>
                     </span>
                     <h4 className="text-white fw-bold mt-1">Plotly</h4>
                     <p className="text-secondary mb-0">Iniciar sesión</p>
