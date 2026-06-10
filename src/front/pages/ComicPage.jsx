@@ -152,12 +152,27 @@ export const ComicPage = () => {
             <div style={{ backgroundColor: "#000000", paddingTop: "32px", paddingBottom: "30px" }}>
                 <div className="d-flex flex-column align-items-center" style={{ gap: "12px" }}>
                     {(obra.paginas || []).map((pagina, index) => (
-                        <img
-                            key={index}
-                            src={pagina}
-                            alt={`Página ${index + 1}`}
-                            style={{ width: "100%", maxWidth: "600px", height: "auto", display: "block" }}
-                        />
+                        pagina.toLowerCase().endsWith(".pdf") ? (
+                            <div key={index} style={{ width: "100%", maxWidth: "800px" }}>
+                                <iframe
+                                    src={pagina}
+                                    title={`Documento ${index + 1}`}
+                                    style={{ width: "100%", height: "85vh", border: "none", borderRadius: "6px", backgroundColor: "#ffffff" }}
+                                    allowFullScreen
+                                />
+                                <a href={pagina} target="_blank" rel="noopener noreferrer"
+                                    className="d-block mt-2 text-center" style={{ color: "#c8b8ff" }}>
+                                    <i className="fa-solid fa-up-right-from-square me-1"></i>Abrir en una pestaña nueva
+                                </a>
+                            </div>
+                        ) : (
+                            <img
+                                key={index}
+                                src={pagina}
+                                alt={`Página ${index + 1}`}
+                                style={{ width: "100%", maxWidth: "600px", height: "auto", display: "block" }}
+                            />
+                        )
                     ))}
                 </div>
             </div>
