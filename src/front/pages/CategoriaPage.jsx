@@ -51,7 +51,7 @@ export const CategoriaPage = () => {
                             <Link key={obra.id} to={`/comic/${obra.id}`} style={{ textDecoration: "none", width: "180px" }}>
                                 <div style={{ backgroundColor: "#1e1e2e", borderRadius: "10px", overflow: "hidden", height: "100%" }}>
                                     <img src={obra.cover || placeholderImage} alt={obra.title}
-                                        style={{ width: "100%", height: "240px", objectFit: "cover" }} />
+                                        style={{ width: "100%", aspectRatio: "2 / 3", objectFit: "cover", backgroundColor: "#1e1e2e" }}/>
                                     <div className="p-2">
                                         <p className="fw-bold mb-1" style={{ color: "#e0e0ff", fontSize: "0.95rem" }}>{obra.title}</p>
                                         <p className="mb-1" style={{ color: "#888aaa", fontSize: "0.8rem" }}>

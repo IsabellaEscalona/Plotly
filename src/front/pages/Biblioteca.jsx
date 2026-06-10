@@ -40,7 +40,7 @@ export const Biblioteca = () => {
                             <img
                                 src={comic.cover || placeholderImage}
                                 alt={comic.title}
-                                style={{ width: "180px", height: "260px", objectFit: "cover", borderRadius: "10px", display: "block" }}
+                                style={{ width: "180px", aspectRatio: "2 / 3", objectFit: "cover", borderRadius: "10px", display: "block", backgroundColor: "#1e1e2e" }}
                             />
                             <div className="mt-2 fw-bold" style={{ fontSize: "0.95rem" }}>{comic.title}</div>
                             <div style={{ color: "#888aaa", fontSize: "0.85rem" }}>{comic.autor}</div>
