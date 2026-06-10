@@ -7,11 +7,10 @@ export const Settings = () => {
     const navigate = useNavigate()
     const [form, setForm] = useState({ username: '', email: '', bio: '', instagram: '', twitter: '', tipo: '', artistType: '', profile_picture: '' })
     const [pass, setPass] = useState({ actual: '', nueva: '', confirmar: '' })
-    const [username, setUsername] = useState(form.username)
-    const [loading, setLoading] = useState(true)
     const [preview, setPreview] = useState('https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp')
     const [mensaje, setMensaje] = useState('')
     const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
 
     const handleFileChangeCover = (e) => {
         const selectedFile = e.target.files[0]
@@ -22,10 +21,7 @@ export const Settings = () => {
         }
     }
 
-    console.log(loading)
-
     useEffect(() => {
-        
         const token = store.token || localStorage.getItem("token")
         if (!token) {
             navigate('/login')
@@ -34,33 +30,28 @@ export const Settings = () => {
         fetch(import.meta.env.VITE_BACKEND_URL + '/api/me', {
             headers: { 'Authorization': 'Bearer ' + token }
         }).then(r => r.json()).then(data => {
-            console.log(data)
             setForm({
-            username: data.username || '', email: data.email || '',
-            bio: data.bio || '', instagram: data.instagram || '',
-            twitter: data.twitter || '', tipo: data.tipo || '',
-            artistType: data.artist_type || 'Hybrid', profile_picture: data.profile_picture
-           
+                username: data.username || '', 
+                email: data.email || '',
+                bio: data.bio || '', 
+                instagram: data.instagram || '',
+                twitter: data.twitter || '', 
+                tipo: data.tipo || '',
+                artistType: data.artist_type || 'Hybrid', 
+                profile_picture: data.profile_picture
+            })
+            if (data.profile_picture) {
+                setPreview(data.profile_picture)
+            }
         })
-        if (data.profile_picture){
-            setPreview(data.profile_picture)
-        }
-    })
-    /* .catch */
-    .finally(() => {
-        setLoading(false)
-    })
-
-
     }, [store.token])
-
-    
 
     const handleSubmit = (e) => {
         e.preventDefault()
         setMensaje(''); setError('')
         const token = store.token || localStorage.getItem("token")
         if (!token) { setError("No hay sesión activa"); return }
+
         if (pass.actual || pass.nueva || pass.confirmar) {
             if (!pass.actual || !pass.nueva || !pass.confirmar) {
                 setError('Completa los tres campos de contraseña'); return
@@ -73,6 +64,8 @@ export const Settings = () => {
             }
         }
 
+        console.log("Archivo de imagen actual:", form.profile_picture)
+
         const formData = new FormData();
         formData.append('username', form.username)
         formData.append('email', form.email)
@@ -83,64 +76,68 @@ export const Settings = () => {
         formData.append('artist_type', form.artistType)
         formData.append('avatar', form.profile_picture)
 
-        /* for (let pair of formData.entries()) {
-            console.log(pair[0], pair[1]);
-        } */
+        for (let pair of formData.entries()) {
+            console.log("FormData key/value:", pair[0], pair[1]);
+        }
 
         updating(formData)
     }
 
-    const updating = async (form) => {
-        console.log()
+    const updating = async (formDataToSend) => {
         setMensaje(''); setError('')
         const token = store.token || localStorage.getItem("token")
-        /* const body_text= {};
-        for (let [key,value] of form.entries()){
-            if (key !== 'avatar')
-        } */
-        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/settings', {
-            method: 'PUT',
-            headers: {'Authorization': 'Bearer ' + token },
-            body: JSON.stringify(form)
-        })
-        if (!resp.ok) { setError('Error al guardar el perfil'); return }
-        const data = await resp.json()
-        dispatch({ type: "set_user", payload: data.user })
-        dispatch({ type: "set_profile", payload: data.profile })
-        setMensaje("Perfil actualizado")
-        if (form.get('avatar') instanceof File) {
-            console.log('Hola')
-            const fd = new FormData()
-            fd.append('profile_picture', form.get('avatar'))
-            const picResp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/profile-picture', {
+        if (!token) { setError("No hay sesión activa"); return }
+        
+        setLoading(true)
+        try {
+            const resp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/settings', {
                 method: 'PUT',
                 headers: { 'Authorization': 'Bearer ' + token },
-                body: fd
+                body: formDataToSend
             })
-            if (!picResp.ok) { setError('Error al subir la foto de perfil'); return }
-        }
-        if (pass.actual) {
-            const passResp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/change-password', {
-                method: 'PUT',
-                headers: {'Authorization': 'Bearer ' + token },
-                body: JSON.stringify({
-                    "contraseña_actual": pass.actual,
-                    "nueva_contraseña": pass.nueva
+            
+            if (!resp.ok) { setError('Error al guardar el perfil'); return }
+            
+            const data = await resp.json()
+            dispatch({ type: "set_user", payload: data.user })
+            dispatch({ type: "set_profile", payload: data.profile })
+            setMensaje("Perfil actualizado")
+
+            if (form.profile_picture instanceof File) {
+                const fd = new FormData()
+                fd.append('profile_picture', form.profile_picture)
+                const picResp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/profile-picture', {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'Bearer ' + token },
+                    body: fd
                 })
-            })
-            const passData = await passResp.json()
-            if (passResp.ok) {
-                setPass({ actual: '', nueva: '', confirmar: '' })
-                setMensaje('Perfil y contraseña actualizados')
-            } else {
-                setError(passData.error || 'Error al cambiar la contraseña')
+                if (!picResp.ok) { setError('Error al subir la foto de perfil'); return }
             }
+            if (pass.actual) {
+                const passResp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/change-password', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({
+                        "contraseña_actual": pass.actual,
+                        "nueva_contraseña": pass.nueva
+                    })
+                })
+                const passData = await passResp.json()
+                if (passResp.ok) {
+                    setPass({ actual: '', nueva: '', confirmar: '' })
+                    setMensaje('Perfil y contraseña actualizados')
+                } else {
+                    setError(passData.error || 'Error al cambiar la contraseña')
+                }
+            }
+        } catch (err) {
+            console.error(err)
+            setError('Ocurrió un error inesperado')
+        } finally {
+            setLoading(false)
         }
     }
-    
-    if (loading){
-        return (<p>Cargando</p>)
-    }
+
     return (
         <form onSubmit={handleSubmit}>
             <div className="container py-5" style={{ maxWidth: '600px', color: '#e0e0ff' }}>
@@ -150,10 +147,7 @@ export const Settings = () => {
                 <div className="row g-3">
                     <div className="col-12 col-md-5 d-flex flex-column align-items-center align-items-md-start">
                         <label className="form-label">Foto de perfil</label>
-                        {form.profile_picture ? <img className="rounded-circle" src={form.profile_picture} alt='Vista previa' style={{ width: '200px', height: '200px', objectFit: 'cover' }} />
-                        :<img className="rounded-circle" src={preview} alt='Vista previa' style={{ width: '200px', height: '200px', objectFit: 'cover' }} />
-                        }
-
+                        {preview && <img className="rounded-circle" src={preview} alt='Vista previa' style={{ width: '200px', height: '200px', objectFit: 'cover' }} />}
                         <input className='form-control mt-2' type='file' accept='.jpg,.jpeg,.png,.webp' onChange={handleFileChangeCover} style={{ width: '200px' }} />
                     </div>
                     <div className='col-md-6'></div>
@@ -162,7 +156,6 @@ export const Settings = () => {
                         <input className="form-control" name="username" value={form.username}
                             onChange={e => setForm({ ...form, username: e.target.value })} />
                     </div>
-                    {/* email aun no recibe cambio correctamente*/}
                     <div className="col-md-6">
                         <label className="form-label">Email</label>
                         <input className="form-control" name="email" value={form.email}
@@ -249,8 +242,10 @@ export const Settings = () => {
                             onChange={e => setPass({ ...pass, confirmar: e.target.value })} />
                     </div>
                     <div className="col-12 d-flex gap-2">
-                        <button className="btn btn-dark" type='submit'>Guardar cambios</button>
-                        <button className="btn btn-outline-secondary" onClick={() => navigate('/me')}>Cancelar</button>
+                        <button className="btn btn-dark" type='submit' disabled={loading}>
+                            {loading ? <><i className="fa-solid fa-spinner fa-spin me-2"></i>Guardando...</> : 'Guardar cambios'}
+                        </button>
+                        <button className="btn btn-outline-secondary" type="button" onClick={() => navigate('/me')}>Cancelar</button>
                     </div>
                 </div>
             </div>
