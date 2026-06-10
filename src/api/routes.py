@@ -138,6 +138,7 @@ def get_following_feed():
         })
     return jsonify(comics), 200
 
+
 @api.route('/profile/<username>/followers', methods=['GET'])
 def get_user_followers(username):
     user = User.query.filter_by(username=username).first()
@@ -201,7 +202,7 @@ def update_profile():
 
     avatar = request.files.get('avatar')
     print(request.files)
-    
+
     """ result = cloudinary.uploader.upload(avatar, folder='avatar_user_plotly') """
     """ if (avatar):
         result = cloudinary.uploader.upload(avatar, folder='avatar_user_plotly')
@@ -304,7 +305,7 @@ def newComic():
 
         db.session.commit()
 
-        return jsonify({'message': 'Post creado exito'}), 200
+        return jsonify({'message': 'Post creado exito', 'id': new_Post.id}), 201
 
     else:
         return jsonify({'message': 'Post no creado'}), 500
@@ -406,7 +407,7 @@ def newHistory():
 
         db.session.commit()
 
-        return jsonify({'message': 'Post creado exito'}), 200
+        return jsonify({'message': 'Post creado exito', 'id': new_Post.id}), 201
 
     else:
         return jsonify({'message': 'Post no creado'}), 500
@@ -578,12 +579,14 @@ def get_feed():
         })
     return jsonify(comics), 200
 
+
 @api.route('/search', methods=['GET'])
 def search_posts():
     query = request.args.get('q', '').strip()
     if not query:
         return jsonify([]), 200
-    posts = Post.query.filter(Post.title.ilike(f'%{query}%')).order_by(Post.id.desc()).all()
+    posts = Post.query.filter(Post.title.ilike(
+        f'%{query}%')).order_by(Post.id.desc()).all()
     resultados = []
     for p in posts:
         resultados.append({

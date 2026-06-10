@@ -39,7 +39,7 @@ export const Navbar = () => {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3 px-lg-4">
             <Link className="navbar-brand d-flex align-items-center gap-2" to="/">
-                <span ><img src={logo} style={{ width: "50px" }}/></span>
+                <span ><img src={logo} style={{ width: "50gitpx" }}/></span>
                 <span className="fw-bold">Plotly</span>
             </Link>
             <div className="d-flex align-items-center gap-2 order-lg-last">
