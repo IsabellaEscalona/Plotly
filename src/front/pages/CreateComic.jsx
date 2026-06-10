@@ -16,6 +16,7 @@ export const CreateComic = () => {
     const [description, setDescription] = useState('')
     const [principalGenre, setPrincipalGenre] = useState('')
     const [secondaryGenre, setSecondaryGenre] = useState('')
+    const [enviando, setEnviando] = useState(false)
     const navigate = useNavigate()
 
 
@@ -57,41 +58,44 @@ export const CreateComic = () => {
 
         register(formData)
     }
-/* CUANDO CREAS, TE MANTENES EN /newComic
-    const register = (form) => {
-
-        const token = store.token || localStorage.getItem("token")
-        const resp = fetch(import.meta.env.VITE_BACKEND_URL + '/api/newComic', {
-            method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + token },
-            body: form
-        })
-            .then((Response) => Response.json())
-
-            .then((data) => console.log(data))
-    }
-*/
-    const register = async (form) => {
-        const token = store.token || localStorage.getItem("token")
-        try {
-            const resp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/newComic', {
+    /* CUANDO CREAS, TE MANTENES EN /newComic
+        const register = (form) => {
+    
+            const token = store.token || localStorage.getItem("token")
+            const resp = fetch(import.meta.env.VITE_BACKEND_URL + '/api/newComic', {
                 method: 'POST',
                 headers: { 'Authorization': 'Bearer ' + token },
                 body: form
             })
-            const data = await resp.json()
-            if (resp.ok) {
-                navigate('/')
-            } else {
-                setError(data.message || 'Hubo un error al crear el cómic')
-            }
-        } catch (err) {
-            setError('No se pudo conectar con el servidor')
+                .then((Response) => Response.json())
+    
+                .then((data) => console.log(data))
         }
+    */
+    const register = async (form) => {
+    const token = store.token || localStorage.getItem("token")
+    setEnviando(true)
+    try {
+        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/newComic', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token },
+            body: form
+        })
+        const data = await resp.json()
+        if (resp.ok) {
+            navigate('/comic/' + data.id)  
+        } else {
+            setError(data.message || 'Hubo un error al crear el cómic')
+            setEnviando(false)             
+        }
+    } catch (err) {
+        setError('No se pudo conectar con el servidor')
+        setEnviando(false)
     }
+}
 
     const MAX_SIZE = 10 * 1024 * 1024
-    
+
     const handleFileChangeCover = (e) => {
         const selectedFile = e.target.files[0]
         if (!selectedFile) return
@@ -265,7 +269,9 @@ export const CreateComic = () => {
                         </div>
                     </div>
                 </div>
-                <button type="submit" className="btn btn-success m-1 ms-0">Crear</button>
+                <button type="submit" className="btn btn-success m-1 ms-0" disabled={enviando}>
+                    {enviando ? 'Creando...' : 'Crear'}
+                </button>
 
                 <Link to='/'><button className="btn btn-secondary m-1">Cancelar</button></Link>
             </div>

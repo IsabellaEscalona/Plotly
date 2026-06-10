@@ -16,6 +16,7 @@ export const CreateHistory = () => {
     const [description, setDescription] = useState('')
     const [principalGenre, setPrincipalGenre] = useState('')
     const [secondaryGenre, setSecondaryGenre] = useState('')
+    const [enviando, setEnviando] = useState(false)
     const navigate = useNavigate()
 
 
@@ -58,18 +59,27 @@ export const CreateHistory = () => {
         register(formData)
     }
 
-    const register = (form) => {
-
-        const token = store.token || localStorage.getItem("token")
-        const resp = fetch(import.meta.env.VITE_BACKEND_URL + '/api/newHistory', {
+    const register = async (form) => {
+    const token = store.token || localStorage.getItem("token")
+    setEnviando(true)
+    try {
+        const resp = await fetch(import.meta.env.VITE_BACKEND_URL + '/api/newHistory', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token },
             body: form
         })
-            .then((Response) => Response.json())
-
-            .then((data) => console.log(data))
+        const data = await resp.json()
+        if (resp.ok) {
+            navigate('/comic/' + data.id)
+        } else {
+            setError(data.message || 'Hubo un error al crear la historia')
+            setEnviando(false)
+        }
+    } catch (err) {
+        setError('No se pudo conectar con el servidor')
+        setEnviando(false)
     }
+}
 
     const MAX_SIZE = 10 * 1024 * 1024
 
@@ -247,7 +257,9 @@ export const CreateHistory = () => {
                         </div>
                     </div>
                 </div>
-                <button type="submit" className="btn btn-success m-1 ms-0">Crear</button>
+                <button type="submit" className="btn btn-success m-1 ms-0" disabled={enviando}>
+                    {enviando ? 'Creando...' : 'Crear'}
+                </button>
 
                 <Link to='/'><button className="btn btn-secondary m-1">Cancelar</button></Link>
             </div>
